@@ -9,5 +9,88 @@
   </head>
   <body>
     <div class="whole-height" id="graphVisualization">
+
+    <script type="x-shader/x-vertex" id="pass-through-vs">
+      void main() {
+        gl_Position = vec4( position, 1.0 );
+      }
+    </script>
+
+    <script type="x-shader/x-fragment" id="pass-through-fs">
+      uniform vec2 resolution;
+      uniform float time;
+      uniform sampler2D pass_texture;
+
+      void main() {
+        vec2 uv = gl_FragCoord.xy / resolution.xy;
+        gl_FragColor = texture2D(pass_texture, uv);
+      }
+    </script>
+
+    <script type="x-shader/x-fragment" id="position-fs">
+#ifdef GL_ES
+      precision highp float;
+#endif
+uniform sampler2D texture_positions;
+uniform sampler2D texture_velocities;
+uniform vec2 resolution;
+uniform float node_count;
+uniform float min_dist;
+uniform float dist_reduction;
+uniform float speed_reduction;
+#define SQPLANETF float(SQPLANET)
+
+void main( void ) {
+  vec2 p = gl_FragCoord.xy / resolution;
+
+  vec3 planetPos = texture2D(texture_positions, p).xyz;
+  vec3 planetVelocity = texture2D(texture_velocities, p).xyz;
+
+  planetVelocity = planetVelocity * 2.0 - 1.0;
+
+  planetVelocity /= speedReduction;
+
+  vec3 newPosition = planetPos + planetVelocity;
+
+  gl_FragColor = vec4(newPosition, 1.0);
+}
+    </script>
+
+    <script type="x-shader/x-fragment" id="velocity-fs">
+#ifdef GL_ES
+      precision highp float;
+#endif
+uniform sampler2D texture_positions;
+uniform sampler2D texture_velocities;
+uniform vec2 resolution;
+uniform float node_count;
+uniform float min_dist;
+uniform float dist_reduction;
+#define SQPLANETF float(SQPLANET)
+
+void main( void ) {
+  vec2 p = gl_FragCoord.xy / resolution;
+
+  vec3 planetPos = texture2D(texture_positions, p).xyz;
+  vec3 planetVelocity = texture2D(texture_velocities, p).xyz;
+
+  vec3 delta = vec3(0.0);
+  for (float x = 0.0; x < SQPLANETF; x += 1.0) {
+    for (float y = 0.0; y < SQPLANETF; y += 1.0) {
+      vec2 tpos = vec2(x / SQPLANETF, y / SQPLANETF);
+      vec3 planet2Pos = texture2D(texture_positions, tpos).xyz;
+      vec3 diff = planet2Pos - planetPos;
+      float dist = length(diff);
+      dist = dist * dist;
+      float F = 1.0 / (min_dist + dist) / dist_reduction / node_count;
+      delta += diff * F;
+    }
+  }
+
+  gl_FragColor = vec4(planetVelocity + delta, 1.0);
+}
+  </script>
+
+
   </body>
 </html>

@@ -3,6 +3,7 @@
     [glsl-graph.macros :as macros :refer [defcom]]
     )
   (:require
+    [clojure.set :as cset]
     [cats.core :as m]
     [com.stuartsierra.component :as component]
     [javelin.core :refer [cell] :refer-macros [cell= dosync]]
@@ -14,6 +15,8 @@
 
 ;; JS Libraries
 (defonce three js/THREE)
+(defonce THREE js/THREE)
+(defonce sweet-alert js/sweetAlert)
 
 ;; COMMON
 
@@ -115,7 +118,7 @@
        height (:height window)
        set-size (or set-size (cell= (-> renderer (.setSize width height))))
        ]
-      ;(-> $body (.append (-> renderer .-domElement)))
+      (-> $body (.append (-> renderer .-domElement)))
       (->
         c
         (assoc :set-size set-size)))
@@ -196,32 +199,166 @@
         (.then resolve reject)))))
 
 (defn handle-graph
-  [data status jqxhr]
-  (-> js/console
-    (.log "data" data))
+  [c graph-data status jqxhr]
+;  (-> js/console
+;    (.log "data" data))
   (let
-    [data (js->clj data :keywordize-keys true)
-     records-per-edge (:recordsPerEdge data)
-     links (:links data)
+    [graph-data (js->clj graph-data :keywordize-keys true)
+     records-per-edge (:recordsPerEdge graph-data)
+     links (:links graph-data)
      edges (for [i (range 0 (count links) records-per-edge)]
              [(get links i) (get links (+ i 1))])
-     graphics (Viva.Graph.View.webglGraphics)
-     graph (js/Viva.Graph.graph)
-     _ (-> graph .beginUpdate)
-     _ (doseq [edge edges]
-         (-> graph (.addLink (get edge 0) (get edge 1))))
-     _ (-> graph .endUpdate)
-     renderer (js/Viva.Graph.View.renderer 
-                graph
-                #js 
-                {
-                 :graphics graphics
-                 :container (js/document.getElementById "graphVisualization")
-                 })
-     _ (-> renderer .run)
+     nodes (sort
+             (cset/union
+               (set (for [edge edges] (get edge 0)))
+               (set (for [edge edges] (get edge 1)))))
+     nodes-indexed (reduce 
+                     (fn [m [i2 n2]] 
+                       (assoc m i2 n2))
+                     {}
+                     (map-indexed vector nodes))
+     nodes-reverse (reduce 
+                     (fn [m [i2 n2]] 
+                       (assoc m n2 i2))
+                     {}
+                     (map-indexed vector nodes))
+     edges-indexed (map
+                     (fn [edge]
+                       [(get nodes-reverse (get edge 0))
+                        (get nodes-reverse (get edge 1))])
+                     edges)
+     node-count (count nodes)
+     sq (js/Math.ceil (js.Math.sqrt node-count))
+     tw sq
+     th sq
+     floats-per-planet 4.0
+     out-width sq
+     out-height sq
+     renderer (data (:renderer c))
+     ;_ (-> renderer (.setSize out-width out-height))
+     ;_ (js/document.body.appendChild renderer.domElement)
+     camera (new three.Camera)
+     _ (set! camera.position.z 1)
+     gl (renderer.getContext)
+     _ (if (= (-> gl (.getExtension "OES_texture_float")) nil)
+         (sweet-alert "No OES_texture_float support for float textures!" "error"))
+     _ (if (= (-> gl (.getParameter gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS)) 0)
+         (sweet-alert "No support for vertex shader textures!" "error"))
+     scene (new THREE.Scene)
+     defines (clj->js {
+              :SQPLANET sq
+              :FLOATSPERPLANET floats-per-planet
+              })
+     uniforms (clj->js {
+                        :node_count node-count
+                        :texture_positions
+                        {
+                         :type "t"
+                         :value nil
+                         }
+                        :texture_velocities
+                        {
+                         :type "t"
+                         :value nil
+                         }
+                        :resolution
+                        {
+                         :type "v2"
+                         :value (new THREE.Vector2 tw th)
+                         }
+                        })
+     uniforms-pass-through (clj->js {
+                            :pass_texture 
+                            {
+                             :type "t"
+                             :value nil
+                            }
+                            :resolution
+                            {
+                             :type "v2"
+                             :value (new three.Vector2 out-width out-height)
+                             }
+                            })
+     pass-through-vs (-> ($ "#pass-through-vs") .text)
+     pass-through-fs (-> ($ "#pass-through-fs") .text)
+     pass-through-material (new THREE.ShaderMaterial 
+                                (clj->js
+                                  {
+                                   :defines defines
+                                   :uniforms uniforms-pass-through
+                                   :vertexShader pass-through-vs
+                                   :fragmentShader pass-through-fs
+                                   :depthWrite false
+                                  }))
+     velocity-fs (-> ($ "#velocity-fs") .text)
+     velocity-material (new THREE.ShaderMaterial
+                            (clj->js
+                              {
+                               :defines defines
+                               :uniforms uniforms
+                               :vertexShader pass-through-vs
+                               :fragmentShader velocity-fs
+                               :depthWrite false
+                               }))
+     position-fs (-> ($ "#position-fs") .text)
+     position-material (new THREE.ShaderMaterial
+                            (clj->js
+                              {
+                               :defines defines
+                               :uniforms uniforms
+                               :vertexShader pass-through-vs
+                               :fragmentShader position-fs
+                               :depthWrite false
+                               }
+                              ))
+     plane (new THREE.PlaneBufferGeometry 2 2)
+     mesh (new THREE.Mesh plane pass-through-material)
+     _ (-> scene (.add mesh))
+     screen-scene (new THREE.Scene)
+     screen-camera (new THREE.PerspectiveCamera 
+                        75 (/ window.innerWidth window.innerHeight) 0.1 1000)
+     _ (set! screen-camera.position.z 1)
+     screen-geometry (new THREE.Geometry)
+     screen-uniforms {
+                     :texture_positions
+                     {
+                      :type "t"
+                      :value nil
+                      }
+                     :resolution
+                     {
+                      :type "v2"
+                      :value (new THREE.Vector2 window.innerWidth window.innerHeight)
+                      }
+                     }
+     screen-attributes {
+                       :displacement_index
+                       {
+                        :type "v"
+                        :value []
+                        :needsUpdate true
+                       }
+                       :pcolor
+                       {
+                        :type "c"
+                        :value []
+                        :needsUpdate true
+                        }
+                       }
+     screen-vs (-> ($ "#screen-vs") .text)
+     screen-fs (-> ($ "#screen-fs") .text)
+     screen-material (new THREE.ShaderMaterial
+                       (clj->js
+                         {
+                          :uniforms screen-uniforms
+                          ;:attributes screen-attributes
+                          :vertexShader screen-vs
+                          :fragmentShader screen-fs
+                          :transparent true
+                          :blending THREE.AdditiveBlending
+                          :depthWrite false
+                          }))
      ]
-    ;(println "links" links)
-    ;(println "edges" edges)
     )
   )
 
@@ -233,12 +370,12 @@
 (defcom
   system
   get-graph
-  []
+  [renderer scene camera]
   [graph]
   (fn [c]
     (->
       (ajax graph-url "json")
-      (p/then handle-graph)
+      (p/then (partial handle-graph c))
       )
       ;(p/catch handle-graph-error))
     c)
