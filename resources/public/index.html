@@ -105,7 +105,7 @@ float rand(vec2 co){
   return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
 }
 
-// FRAGMENT SHADER
+// POSITION SHADER
 vec3 calcSpring(float alpha, float degree, vec3 planetPos, float planetIndex) {
   vec3 delta = vec3(0.0);
 
@@ -141,7 +141,6 @@ vec3 calcSpring(float alpha, float degree, vec3 planetPos, float planetIndex) {
     float X = dist - SPRING_LENGTH;
     float F_spring = SPRING_COEFF * X;
     //delta += diff * F_spring * k;
-    //planetPos + (planet2Pos - planetPos)
   }
 
   // Coloumb force
@@ -167,7 +166,7 @@ vec3 calcGravity(float alpha, float degree, vec3 planetPos) {
   return delta;
 }
 
-// FRAGMENT SHADER
+// POSITION SHADER
 void main( void ) {
   vec2 p = gl_FragCoord.xy / u_resolution;
 
@@ -207,9 +206,9 @@ void main( void ) {
     } else {
       planetIndex = fourEdges[0];
     }
-    delta += calcSpring(alpha, degree, planetPos, planetIndex * NODECOUNTF);
+    //delta += calcSpring(alpha, degree, planetPos, planetIndex * NODECOUNTF);
   }
-  delta += calcGravity(1.0, degree, planetPos);
+  //delta += calcGravity(1.0, degree, planetPos);
   const float maxSpeed = 0.1;
   delta = clamp(delta, vec3(-maxSpeed), vec3(maxSpeed));
 
@@ -269,7 +268,12 @@ vec3 project(vec3 diff) {
   }
 }
 
-// VERTEX SHADER
+float attract(float d) {
+  //return log(d);
+  return d * d;
+}
+
+// VELOCITY SHADER
 vec3 calcSpring(float degree, vec3 planetPos, float planetIndex) {
   vec3 delta = vec3(0.0);
 
@@ -282,14 +286,22 @@ vec3 calcSpring(float degree, vec3 planetPos, float planetIndex) {
   // forces
   float dist = length(diff);
   float distSquare = dist * dist;
-  float k = other_degree / (other_degree + degree);
+  // float k = other_degree / (other_degree + degree);
+  float k = 1.0;
 
   // spring force
   float SPRING_LENGTH = 0.5;
   float SPRING_COEFF = 0.0008;
-  float X = (dist - SPRING_LENGTH) / dist;
-  float F_spring = SPRING_COEFF * X;
-  //delta += diff * F_spring;
+  float k1 = 1.0e5;
+  if (dist < SPRING_LENGTH) {
+    float X = attract(k1 * (SPRING_LENGTH - dist));
+    float F_spring = SPRING_COEFF * X;
+    delta += -diff * F_spring * k;
+  } else if (dist > SPRING_LENGTH) {
+    float X = attract(k1 * (dist - SPRING_LENGTH));
+    float F_spring = SPRING_COEFF * X;
+    delta += diff * F_spring * k;
+  }
 
   // Coloumb force
   float ke = 8.987 * 10.0e9;
@@ -305,7 +317,7 @@ vec3 calcSpring(float degree, vec3 planetPos, float planetIndex) {
   return delta;
 }
 
-// VERTEX SHADER
+// VELOCITY SHADER
 vec3 calcGravity(float degree, vec3 planetPos, float planetIndex) {
   vec3 delta = vec3(0.0);
 
@@ -321,7 +333,7 @@ vec3 calcGravity(float degree, vec3 planetPos, float planetIndex) {
   float k = other_degree / (other_degree + degree);
 
   // gravity
-  const float G = -1.2 / 1e3;
+  const float G = -1.2 / 1e8;
   //float F_gravity = G / (u_min_dist + distSquare) / u_dist_reduction;
   float F_gravity = G / (0.0001 + distSquare) / u_dist_reduction;
   //delta += normalize(diff) * F_gravity;
@@ -338,7 +350,7 @@ vec3 calcGravity(float degree, vec3 planetPos, float planetIndex) {
   return delta;
 }
 
-// VERTEX SHADER
+// VELOCITY SHADER
 void main( void ) {
   vec2 p = gl_FragCoord.xy / u_resolution;
 
@@ -370,10 +382,10 @@ void main( void ) {
     } else if (off == 3) {
       planetIndex = fourEdges[3];
     }
-    //delta += calcSpring(degree, planetPos, planetIndex * NODECOUNTF);
+    delta += calcSpring(degree, planetPos, planetIndex * NODECOUNTF);
+    delta -= calcGravity(degree, planetPos, planetIndex * NODECOUNTF);
   }
   for (float i = 0.0; i < NODECOUNTF; i += 1.0) {
-    //delta += calcSpring(degree, planetPos, i);
     delta += calcGravity(degree, planetPos, i);
   }
   delta = clamp(delta, vec3(-1.0), vec3(1.0));
