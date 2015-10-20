@@ -234,7 +234,7 @@
     [rgba-size 4
      raw-positions (new js/Float32Array (* tw th rgba-size))
      raw-velocities (new js/Float32Array (* tw th rgba-size))
-     _ (doseq [i (range 0 node-count rgba-size)]
+     _ (doseq [i (range 0 (* tw th rgba-size) rgba-size)]
          (let
            [x (js/Math.random)
             y (js/Math.random)
@@ -485,9 +485,6 @@
      vertices (-> screen-geometry (.getAttribute "position"))
      a_displacement_index (-> screen-geometry (.getAttribute "a_displacement_index"))
      a_color (-> screen-geometry (.getAttribute "a_color"))
-     _ (println "vertices" (-> vertices .-count) (-> vertices .-itemSize))
-     _ (println "a_displ" (-> a_displacement_index .-count) (-> a_displacement_index .-itemSize))
-     _ (println "a_color" (-> a_color .-count) (-> a_color .-itemSize))
      _ (doseq [i (range 0 node-count)]
          (let
            [[xf yf] (node-index-to-texture i)
