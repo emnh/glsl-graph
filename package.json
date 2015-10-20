@@ -12,7 +12,9 @@
     "browserify": "11.2.0",
     "jquery": "2.1.4",
     "vivagraphjs": "0.8.1",
-    "sweetalert": "1.1.0"
+    "sweetalert": "1.1.0",
+    "three-orbit-controls": "mattdesl/three-orbit-controls#master",
+    "stats.js": "mrdoob/stats.js#master"
   },
   "devDependencies": {
     "source-map-support": "0.2.8"

@@ -57,6 +57,45 @@
 (add-component system :raycaster (new-jsobj #(new three.Raycaster)))
 (add-component system :light (new-jsobj #(new three.DirectionalLight)))
 
+(add-component system :render-stats (new-jsobj #(new js/Stats)))
+(add-component system :physics-stats (new-jsobj #(new js/Stats)))
+
+(defcom
+  system
+  init-stats
+  [render-stats physics-stats]
+  []
+  (fn [c]
+    (let
+      [render-stats (data render-stats)
+       physics-stats (data physics-stats)
+       $render-stats ($ (-> render-stats .-domElement))
+       $physics-stats ($ (-> physics-stats .-domElement))
+       ]
+      (->
+        ($ "body")
+        (.append $render-stats))
+      (jayq/css
+          $render-stats
+          {
+           :position "absolute"
+           :top 0
+           :z-index 100
+           })
+      (->
+        ($ "body")
+        (.append $physics-stats))
+      (jayq/css
+          $physics-stats
+          {
+           :position "absolute"
+           :top 50
+           :z-index 100
+           }))
+    c)
+  identity
+  )
+
 (defcom
   system
   window
@@ -151,28 +190,64 @@
   )
 
 (defn render-loop
-  [c]
+  [c o]
   (let
     [camera (:camera (:camera c))
      scene (data (:scene c))
      renderer (data (:renderer c))
      running @(:running c)
+     o (if (= o nil) 
+         @(get-in c [:get-graph :render-options])
+         o)
      ]
-    ; TODO: integrate
-    ;(-> renderer (.render scene camera))
-    (if running (js/requestAnimationFrame (partial render-loop c)))
+    (if 
+      (not= o nil)
+      (do
+        (aset (:uniforms o) "u_texture_positions" "value" (:rt-positions2 o))
+        (aset (:uniforms o) "u_texture_velocities" "value" (:rt-velocities2 o))
+
+        ; update velocities
+        (aset (:mesh o) "material" (:velocity-material o))
+        (-> (:renderer o) (.render (:scene o) (:camera o) (:rt-velocities1 o) true))
+
+        ; update positions
+        (aset (:mesh o) "material" (:position-material o))
+        (-> (:renderer o) (.render (:scene o) (:camera o) (:rt-positions1 o) true))
+
+        ; render to screen
+        (-> (:renderer o) (.setSize window.innerWidth window.innerHeight))
+        (-> (:screen-camera o) .-aspect (set! (/ window.innerWidth window.innerHeight)))
+        (-> (:renderer o) (.render (:screen-scene o) (:screen-camera o)))
+
+        (let
+          [render-stats (data (get-in o [:c :render-stats]))]
+          (-> render-stats .update)
+          )
+
+        ; swap buffers and iterate
+        (let
+          [o (-> o
+               (assoc :rt-positions1 (:rt-positions2 o))
+               (assoc :rt-positions2 (:rt-positions1 o))
+               (assoc :rt-velocities1 (:rt-velocities2 o))
+               (assoc :rt-velocities2 (:rt-velocities1 o))
+               )]
+          (if running (js/requestAnimationFrame (partial render-loop c o)))
+          ))
+      (if running (js/requestAnimationFrame (partial render-loop c nil)))
+      )
     )
   )
 
 (defcom
   system
   render-loop
-  [renderer camera scene]
+  [renderer camera scene init-scene get-graph]
   [running]
   (fn [c] 
     (let 
       [c (assoc c :running (atom true))]
-      (render-loop c)
+      (render-loop c nil)
       c))
   (fn [c]
     (if
@@ -198,35 +273,6 @@
            }
           )
         (.then resolve reject)))))
-
-(defn render2
-  [o]
-  (aset (:uniforms o) "u_texture_positions" "value" (:rt-positions2 o))
-  (aset (:uniforms o) "u_texture_velocities" "value" (:rt-velocities2 o))
-
-  ; update velocities
-  (aset (:mesh o) "material" (:velocity-material o))
-  (-> (:renderer o) (.render (:scene o) (:camera o) (:rt-velocities1 o) true))
-
-  ; update positions
-  (aset (:mesh o) "material" (:position-material o))
-  (-> (:renderer o) (.render (:scene o) (:camera o) (:rt-positions1 o) true))
-
-  ; render to screen
-  (-> (:renderer o) (.setSize window.innerWidth window.innerHeight))
-  (-> (:renderer o) (.render (:screen-scene o) (:screen-camera o)))
-
-  ; swap buffers and iterate
-  (let
-    [o (-> o
-         (assoc :rt-positions1 (:rt-positions2 o))
-         (assoc :rt-positions2 (:rt-positions1 o))
-         (assoc :rt-velocities1 (:rt-velocities2 o))
-         (assoc :rt-velocities2 (:rt-velocities1 o))
-         )]
-    (js/requestAnimationFrame (partial render2 o))
-    )
-  )
 
 (defn gen-texture
   [node-count tw th]
@@ -278,8 +324,6 @@
 
 (defn handle-graph
   [c graph-data status jqxhr]
-;  (-> js/console
-;    (.log "data" data))
   (let
     [graph-data (js->clj graph-data :keywordize-keys true)
      records-per-edge (:recordsPerEdge graph-data)
@@ -415,6 +459,8 @@
      screen-camera (new THREE.PerspectiveCamera 
                         75 (/ window.innerWidth window.innerHeight) 0.1 1000)
      _ (set! screen-camera.position.z 1)
+     ;controls (new js/OrbitControls screen-camera (-> renderer .-domElement))
+     controls (new js/OrbitControls screen-camera)
      screen-geometry (new THREE.Geometry)
      screen-uniforms {
                      :u_texture_positions
@@ -544,9 +590,10 @@
        :renderer renderer
        :screen-scene screen-scene
        :screen-camera screen-camera
+       :c c
        }
-     _ (render2 options)
      ]
+    (reset! (:render-options c) options)
     )
   )
 
@@ -558,15 +605,17 @@
 (defcom
   system
   get-graph
-  [renderer scene camera]
-  [graph]
+  [renderer scene camera render-stats init-scene]
+  [graph render-options]
   (fn [c]
-    (->
-      (ajax graph-url "json")
-      (p/then (partial handle-graph c))
-      )
-      ;(p/catch handle-graph-error))
-    c)
+    (let
+      [c (assoc c :render-options (atom nil))]
+      (->
+        (ajax graph-url "json")
+        (p/then (partial handle-graph c))
+        )
+        ;(p/catch handle-graph-error))
+      c))
   identity
   )
 
@@ -579,7 +628,15 @@
   []
   (reset! ran true)
   (println "main")
-  (swap! system component/stop-system)
+  (try
+    (swap! system component/stop-system)
+    (catch js/Object e
+      (let
+        [simple-e (component/ex-without-components e)]
+        (.log js/console simple-e)
+        (.log js/console (aget simple-e "cause"))
+        (throw (aget simple-e "cause"))
+        )))
   (try
     (swap! system component/start-system)
     (catch js/Object e
@@ -590,7 +647,7 @@
         (throw (aget simple-e "cause"))
         ))))
 
-(if @ran (main) (js/$ (main)))
+(if @ran (main) (js/$ main))
 
 (defn on-js-reload []
   ;; optionally touch your app-state to force rerendering depending on
