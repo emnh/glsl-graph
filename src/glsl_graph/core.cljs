@@ -129,7 +129,7 @@
           height @(:height window)
           FOV 35
           frustumFar 1000000
-          frustumNear 1
+          frustumNear 0
           ]
           (new js/THREE.PerspectiveCamera FOV (/ width height) frustumNear frustumFar)))
        new-aspect (or 
@@ -203,8 +203,12 @@
     (if 
       (not= o nil)
       (do
+        (aset (:uniforms o) "u_time" "value" (-> (new js/Date) .getTime))
         (aset (:uniforms o) "u_texture_positions" "value" (:rt-positions2 o))
         (aset (:uniforms o) "u_texture_velocities" "value" (:rt-velocities2 o))
+        (aset (:uniforms o) "u_texture_edges" "value" (:t-edges o))
+        (aset (:uniforms o) "u_iteration" "value"
+              (+ 1 (aget (:uniforms o) "u_iteration" "value")))
 
         ; update velocities
         (aset (:mesh o) "material" (:velocity-material o))
@@ -215,6 +219,7 @@
         (-> (:renderer o) (.render (:scene o) (:camera o) (:rt-positions1 o) true))
 
         ; render to screen
+        (aset (:screen-uniforms o) "u_texture_positions" "value" (:rt-positions1 o))
         (-> (:renderer o) (.setSize window.innerWidth window.innerHeight))
         (-> (:screen-camera o) .-aspect (set! (/ window.innerWidth window.innerHeight)))
         (-> (:renderer o) (.render (:screen-scene o) (:screen-camera o)))
@@ -275,50 +280,69 @@
         (.then resolve reject)))))
 
 (defn gen-texture
-  [node-count tw th]
+  [node-count edge-count tw th ew eh node-neighbours-startpos node-neighbours-flat]
   (let
     [rgba-size 4
      raw-positions (new js/Float32Array (* tw th rgba-size))
      raw-velocities (new js/Float32Array (* tw th rgba-size))
-     _ (doseq [i (range 0 (* tw th rgba-size) rgba-size)]
+     raw-edges (new js/Float32Array (* ew eh rgba-size))
+     _ (doseq [i (range node-count)]
          (let
-           [x (js/Math.random)
-            y (js/Math.random)
-            z (js/Math.random)]
-           (aset raw-positions (+ i 0) x)
-           (aset raw-positions (+ i 1) y)
-           (aset raw-positions (+ i 2) z)
-           (aset raw-positions (+ i 3) 0)
-           )
-         (let
-           [x (js/Math.random)
-            y (js/Math.random)
-            z (js/Math.random)]
-           (aset raw-velocities (+ i 0) x)
-           (aset raw-velocities (+ i 1) y)
-           (aset raw-velocities (+ i 2) z)
-           (aset raw-velocities (+ i 3) 0)
+           [j (* i rgba-size)]
+           (let
+             [sz 0
+              fixed 0.5
+              x (* sz (js/Math.random))
+              y (* sz (js/Math.random))
+              z (* sz (js/Math.random))
+              x fixed
+              y fixed
+              z fixed
+              w2 (nth node-neighbours-startpos (+ i 1))
+              w1 (nth node-neighbours-startpos (+ i 0))
+              w (- w2 w1)
+              w (/ w edge-count)
+              ]
+             (aset raw-positions (+ j 0) x)
+             (aset raw-positions (+ j 1) y)
+             (aset raw-positions (+ j 2) z)
+             (aset raw-positions (+ j 3) w)
+             )
+           (let
+             [x (js/Math.random)
+              y (js/Math.random)
+              z (js/Math.random)
+              w (nth node-neighbours-startpos (+ i 0))
+              w (/ w edge-count)
+              ]
+             (aset raw-velocities (+ j 0) x)
+             (aset raw-velocities (+ j 1) y)
+             (aset raw-velocities (+ j 2) z)
+             (aset raw-velocities (+ j 3) w)
+             )
            ))
-     t-positions (new THREE.DataTexture
-                      raw-positions
-                      tw th
-                      THREE.RGBAFormat
-                      THREE.FloatType)
-     _ (aset t-positions "minFilter" THREE.NearestFilter)
-     _ (aset t-positions "wrapS" THREE.ClampToEdgeWrapping)
-     _ (aset t-positions "wrapT" THREE.ClampToEdgeWrapping)
-     _ (aset t-positions "needsUpdate" true)
-     t-velocities (new THREE.DataTexture
-                      raw-velocities
-                      tw th
-                      THREE.RGBAFormat
-                      THREE.FloatType)
-     _ (aset t-velocities "minFilter" THREE.NearestFilter)
-     _ (aset t-velocities "wrapS" THREE.ClampToEdgeWrapping)
-     _ (aset t-velocities "wrapT" THREE.ClampToEdgeWrapping)
-     _ (aset t-velocities "needsUpdate" true)
+     _ (doseq [i (range edge-count)]
+         (let
+          [
+           x (nth node-neighbours-flat i)
+           x (/ x node-count)
+           ]
+          (aset raw-edges i x)
+          ))
+     new-texture 
+      #(let
+         [t (new THREE.DataTexture %1 %2 %3 THREE.RGBAFormat THREE.FloatType)]
+         (doto t
+           (aset "minFilter" THREE.NearestFilter)
+           (aset "wrapS" THREE.ClampToEdgeWrapping)
+           (aset "wrapT" THREE.ClampToEdgeWrapping)
+           (aset "needsUpdate" true))
+          t)
+     t-positions (new-texture raw-positions tw th)
+     t-velocities (new-texture raw-velocities tw th)
+     t-edges (new-texture raw-edges ew eh)
      ]
-    [t-positions t-velocities]
+    [t-positions t-velocities t-edges]
     ))
 
 
@@ -350,12 +374,38 @@
                         (get nodes-reverse (get edge 1))])
                      edges)
      node-count (count nodes)
-     sq (js/Math.ceil (js.Math.sqrt node-count))
-     tw sq
-     th sq
+     node-neighbours (vec (map #(vector) (range node-count)))
+     node-neighbours (reduce
+                       (fn [m edge]
+                         (-> m
+                           (update-in [(get edge 0)] #(conj % (get edge 1)))
+                           (update-in [(get edge 1)] #(conj % (get edge 0)))))
+                       node-neighbours
+                       edges-indexed)
+     degrees (map #(count %) node-neighbours)
+     max-degree (apply max degrees)
+     [node-neighbours-startpos total] 
+      (reduce
+       (fn [[v total] neighbour-list]
+         [(conj v total)
+          (+ total (count neighbour-list))
+          ])
+       [[] 0]
+       node-neighbours)
+     node-neighbours-startpos (conj node-neighbours-startpos total)
+     node-neighbours-flat (vec (flatten node-neighbours))
+     directed-edge-count (count edges-indexed)
+     edge-count (count node-neighbours-flat)
+     ;_ (println "nn" (take-last 10 node-neighbours-startpos))
+     node-sq (js/Math.ceil (js.Math.sqrt node-count))
+     edge-sq (js/Math.ceil (js.Math.sqrt edge-count))
+     tw node-sq
+     th node-sq
+     ew edge-sq
+     eh edge-sq
      floats-per-planet 4.0
-     out-width sq
-     out-height sq
+     out-width node-sq
+     out-height node-sq
      renderer (data (:renderer c))
      ;_ (-> renderer (.setSize out-width out-height))
      ;_ (js/document.body.appendChild renderer.domElement)
@@ -368,10 +418,19 @@
          (sweet-alert "No support for vertex shader textures!" "error"))
      scene (new THREE.Scene)
      defines (clj->js {
-              :SQPLANET sq
+              :NODECOUNT node-count
+              :EDGECOUNT edge-count
+              :SQNODE node-sq
+              :SQEDGE edge-sq
               :FLOATSPERPLANET floats-per-planet
+              :USE3D true
               })
      uniforms (clj->js {
+                        :u_time
+                        {
+                         :type "f"
+                         :value 0.0
+                         }
                         :u_speed_reduction
                         {
                          :type "f"
@@ -401,6 +460,16 @@
                         {
                          :type "t"
                          :value nil
+                         }
+                        :u_texture_edges
+                        {
+                         :type "t"
+                         :value nil
+                         }
+                        :u_iteration
+                        {
+                         :type "f"
+                         :value 0
                          }
                         :u_resolution
                         {
@@ -458,22 +527,23 @@
      screen-scene (new THREE.Scene)
      screen-camera (new THREE.PerspectiveCamera 
                         75 (/ window.innerWidth window.innerHeight) 0.1 1000)
-     _ (set! screen-camera.position.z 1)
+     _ (set! screen-camera.position.y 1)
      ;controls (new js/OrbitControls screen-camera (-> renderer .-domElement))
      controls (new js/OrbitControls screen-camera)
      screen-geometry (new THREE.Geometry)
-     screen-uniforms {
-                     :u_texture_positions
-                     {
-                      :type "t"
-                      :value nil
-                      }
-                     :u_resolution
-                     {
-                      :type "v2"
-                      :value (new THREE.Vector2 window.innerWidth window.innerHeight)
-                      }
-                     }
+     screen-uniforms (clj->js
+                       {
+                        :u_texture_positions
+                        {
+                         :type "t"
+                         :value nil
+                         }
+                        :u_resolution
+                        {
+                         :type "v2"
+                         :value (new THREE.Vector2 window.innerWidth window.innerHeight)
+                         }
+                        })
      screen-attributes {
                        :a_displacement_index
                        {
@@ -542,9 +612,57 @@
            (-> a_displacement_index (.setXY i xf yf))
            (-> a_color (.setXYZ i r g b)) 
          ))
-     particle-cloud (new THREE.Points screen-geometry screen-material)
-     _ (-> screen-scene (.add particle-cloud))
+     points (new THREE.Points screen-geometry screen-material)
+     _ (-> screen-scene (.add points))
      _ (-> screen-scene (.add (new THREE.AmbientLight 0x444444)))
+
+     ; LINES
+     lines-geometry (new THREE.BufferGeometry)
+     _ (-> lines-geometry
+         (.addAttribute
+           "position"
+           (new THREE.BufferAttribute
+                (new js/Float32Array (* directed-edge-count 9))
+                3)))
+     _ (-> lines-geometry
+         (.addAttribute
+           "a_displacement_index"
+           (new THREE.BufferAttribute
+                (new js/Float32Array (* directed-edge-count 6))
+                2)))
+     lines-vs (-> ($ "#lines-vs") .text)
+     lines-fs (-> ($ "#lines-fs") .text)
+     lines-material (new THREE.ShaderMaterial
+                         (clj->js
+                           {
+                            :uniforms screen-uniforms
+                            :vertexShader lines-vs
+                            :fragmentShader lines-fs
+                            :transparent true
+                            :blending THREE.AdditiveBlending
+                            :depthWrite false
+                            }))
+     position (-> lines-geometry (.getAttribute "position"))
+     _ (-> lines-geometry .computeBoundingSphere)
+     a_displacement_index (-> lines-geometry (.getAttribute "a_displacement_index"))
+     _ (doseq [[i [n1 n2]] (map-indexed vector edges-indexed)]
+         (let
+           [j (* i 3)
+            [xf1 yf1] (node-index-to-texture n1)
+            [xf2 yf2] (node-index-to-texture n2)
+            inf (-> js/Number .-POSITIVE_INFINITY)
+            ]
+           (-> position (.setXYZ (+ j 0) 0 0 0))
+           (-> position (.setXYZ (+ j 1) 0 0 0))
+           (-> position (.setXYZ (+ j 2) inf inf inf))
+           (-> a_displacement_index (.setXY (+ j 0) xf1 yf1))
+           (-> a_displacement_index (.setXY (+ j 1) xf2 yf2))
+           (-> a_displacement_index (.setXY (+ j 2) xf2 yf2))
+           ))
+     lines (new THREE.Line lines-geometry lines-material)
+     _ (-> screen-scene (.add lines))
+
+     ; RENDER TARGETS
      rt (new THREE.WebGLRenderTarget
                         tw th
                         #js 
@@ -562,7 +680,8 @@
      rt-positions2 (-> rt .clone)
      rt-velocities1 (-> rt .clone)
      rt-velocities2 (-> rt .clone)
-     [t-positions t-velocities] (gen-texture node-count tw th)
+     [t-positions t-velocities t-edges]
+      (gen-texture node-count edge-count tw th ew eh node-neighbours-startpos node-neighbours-flat)
 
      ; copy positions texture
      _ (aset uniforms-pass-through "u_pass_texture" "value" t-positions)
@@ -587,9 +706,11 @@
        :camera camera
        :velocity-material velocity-material
        :position-material position-material
+       :t-edges t-edges
        :renderer renderer
        :screen-scene screen-scene
        :screen-camera screen-camera
+       :screen-uniforms screen-uniforms
        :c c
        }
      ]
