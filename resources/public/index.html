@@ -17,13 +17,12 @@
     </script>
 
     <script type="x-shader/x-fragment" id="pass-through-fs">
-      uniform vec2 resolution;
-      uniform float time;
-      uniform sampler2D pass_texture;
+      uniform vec2 u_resolution;
+      uniform sampler2D u_pass_texture;
 
       void main() {
-        vec2 uv = gl_FragCoord.xy / resolution.xy;
-        gl_FragColor = texture2D(pass_texture, uv);
+        vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+        gl_FragColor = texture2D(u_pass_texture, uv);
       }
     </script>
 
@@ -31,24 +30,24 @@
 #ifdef GL_ES
       precision highp float;
 #endif
-uniform sampler2D texture_positions;
-uniform sampler2D texture_velocities;
-uniform vec2 resolution;
-uniform float node_count;
-uniform float min_dist;
-uniform float dist_reduction;
-uniform float speed_reduction;
+uniform sampler2D u_texture_positions;
+uniform sampler2D u_texture_velocities;
+uniform vec2 u_resolution;
+uniform float u_node_count;
+uniform float u_min_dist;
+uniform float u_dist_reduction;
+uniform float u_speed_reduction;
 #define SQPLANETF float(SQPLANET)
 
 void main( void ) {
-  vec2 p = gl_FragCoord.xy / resolution;
+  vec2 p = gl_FragCoord.xy / u_resolution;
 
-  vec3 planetPos = texture2D(texture_positions, p).xyz;
-  vec3 planetVelocity = texture2D(texture_velocities, p).xyz;
+  vec3 planetPos = texture2D(u_texture_positions, p).xyz;
+  vec3 planetVelocity = texture2D(u_texture_velocities, p).xyz;
 
   planetVelocity = planetVelocity * 2.0 - 1.0;
 
-  planetVelocity /= speedReduction;
+  planetVelocity /= u_speed_reduction;
 
   vec3 newPosition = planetPos + planetVelocity;
 
@@ -60,29 +59,29 @@ void main( void ) {
 #ifdef GL_ES
       precision highp float;
 #endif
-uniform sampler2D texture_positions;
-uniform sampler2D texture_velocities;
-uniform vec2 resolution;
-uniform float node_count;
-uniform float min_dist;
-uniform float dist_reduction;
+uniform sampler2D u_texture_positions;
+uniform sampler2D u_texture_velocities;
+uniform vec2 u_resolution;
+uniform float u_node_count;
+uniform float u_min_dist;
+uniform float u_dist_reduction;
 #define SQPLANETF float(SQPLANET)
 
 void main( void ) {
-  vec2 p = gl_FragCoord.xy / resolution;
+  vec2 p = gl_FragCoord.xy / u_resolution;
 
-  vec3 planetPos = texture2D(texture_positions, p).xyz;
-  vec3 planetVelocity = texture2D(texture_velocities, p).xyz;
+  vec3 planetPos = texture2D(u_texture_positions, p).xyz;
+  vec3 planetVelocity = texture2D(u_texture_velocities, p).xyz;
 
   vec3 delta = vec3(0.0);
   for (float x = 0.0; x < SQPLANETF; x += 1.0) {
     for (float y = 0.0; y < SQPLANETF; y += 1.0) {
       vec2 tpos = vec2(x / SQPLANETF, y / SQPLANETF);
-      vec3 planet2Pos = texture2D(texture_positions, tpos).xyz;
+      vec3 planet2Pos = texture2D(u_texture_positions, tpos).xyz;
       vec3 diff = planet2Pos - planetPos;
       float dist = length(diff);
       dist = dist * dist;
-      float F = 1.0 / (min_dist + dist) / dist_reduction / node_count;
+      float F = 1.0 / (u_min_dist + dist) / u_dist_reduction / u_node_count;
       delta += diff * F;
     }
   }
@@ -91,6 +90,50 @@ void main( void ) {
 }
   </script>
 
+  <script type="x-shader/x-vertex" id="screen-vs">
+#ifdef GL_ES
+precision highp float;
+#endif
+
+uniform sampler2D u_texture_positions;
+attribute vec3 a_color;
+attribute vec2 a_displacement_index;
+varying vec3 v_color;
+
+void main() {
+  vec3 planetPos = texture2D(u_texture_positions, a_displacement_index).xyz;
+  planetPos = (planetPos * 2.0) - 1.0;
+  // planetPos += position.xyz;
+  v_color = a_color;
+
+  gl_PointSize = 25.0;
+
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(planetPos, 1.0);
+}
+
+  </script>
+
+  <script type="x-shader/x-fragment" id="screen-fs">
+#ifdef GL_ES
+precision highp float;
+#endif
+
+varying vec3 v_color;
+
+void main()
+{
+  vec2 mid = vec2(0.5, 0.5);
+  float d = length(gl_PointCoord - mid);
+  float r = 0.1 / pow(d, 2.0);
+  float alpha = 0.0;
+  const float outer = 0.5;
+  if (d < outer) {
+    alpha = 1.0 - d;
+  }
+  vec3 rgb = v_color * r;
+  gl_FragColor = vec4(rgb, alpha);
+}
+  </script>
 
   </body>
 </html>

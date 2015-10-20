@@ -158,7 +158,8 @@
      renderer (data (:renderer c))
      running @(:running c)
      ]
-    (-> renderer (.render scene camera))
+    ; TODO: integrate
+    ;(-> renderer (.render scene camera))
     (if running (js/requestAnimationFrame (partial render-loop c)))
     )
   )
@@ -197,6 +198,83 @@
            }
           )
         (.then resolve reject)))))
+
+(defn render2
+  [o]
+  (aset (:uniforms o) "u_texture_positions" "value" (:rt-positions2 o))
+  (aset (:uniforms o) "u_texture_velocities" "value" (:rt-velocities2 o))
+
+  ; update velocities
+  (aset (:mesh o) "material" (:velocity-material o))
+  (-> (:renderer o) (.render (:scene o) (:camera o) (:rt-velocities1 o) true))
+
+  ; update positions
+  (aset (:mesh o) "material" (:position-material o))
+  (-> (:renderer o) (.render (:scene o) (:camera o) (:rt-positions1 o) true))
+
+  ; render to screen
+  (-> (:renderer o) (.setSize window.innerWidth window.innerHeight))
+  (-> (:renderer o) (.render (:screen-scene o) (:screen-camera o)))
+
+  ; swap buffers and iterate
+  (let
+    [o (-> o
+         (assoc :rt-positions1 (:rt-positions2 o))
+         (assoc :rt-positions2 (:rt-positions1 o))
+         (assoc :rt-velocities1 (:rt-velocities2 o))
+         (assoc :rt-velocities2 (:rt-velocities1 o))
+         )]
+    (js/requestAnimationFrame (partial render2 o))
+    )
+  )
+
+(defn gen-texture
+  [node-count tw th]
+  (let
+    [rgba-size 4
+     raw-positions (new js/Float32Array (* tw th rgba-size))
+     raw-velocities (new js/Float32Array (* tw th rgba-size))
+     _ (doseq [i (range 0 node-count rgba-size)]
+         (let
+           [x (js/Math.random)
+            y (js/Math.random)
+            z (js/Math.random)]
+           (aset raw-positions (+ i 0) x)
+           (aset raw-positions (+ i 1) y)
+           (aset raw-positions (+ i 2) z)
+           (aset raw-positions (+ i 3) 0)
+           )
+         (let
+           [x (js/Math.random)
+            y (js/Math.random)
+            z (js/Math.random)]
+           (aset raw-velocities (+ i 0) x)
+           (aset raw-velocities (+ i 1) y)
+           (aset raw-velocities (+ i 2) z)
+           (aset raw-velocities (+ i 3) 0)
+           ))
+     t-positions (new THREE.DataTexture
+                      raw-positions
+                      tw th
+                      THREE.RGBAFormat
+                      THREE.FloatType)
+     _ (aset t-positions "minFilter" THREE.NearestFilter)
+     _ (aset t-positions "wrapS" THREE.ClampToEdgeWrapping)
+     _ (aset t-positions "wrapT" THREE.ClampToEdgeWrapping)
+     _ (aset t-positions "needsUpdate" true)
+     t-velocities (new THREE.DataTexture
+                      raw-velocities
+                      tw th
+                      THREE.RGBAFormat
+                      THREE.FloatType)
+     _ (aset t-velocities "minFilter" THREE.NearestFilter)
+     _ (aset t-velocities "wrapS" THREE.ClampToEdgeWrapping)
+     _ (aset t-velocities "wrapT" THREE.ClampToEdgeWrapping)
+     _ (aset t-velocities "needsUpdate" true)
+     ]
+    [t-positions t-velocities]
+    ))
+
 
 (defn handle-graph
   [c graph-data status jqxhr]
@@ -250,30 +328,49 @@
               :FLOATSPERPLANET floats-per-planet
               })
      uniforms (clj->js {
-                        :node_count node-count
-                        :texture_positions
+                        :u_speed_reduction
+                        {
+                         :type "f"
+                         :value 1000.0
+                         }
+                        :u_min_dist
+                        {
+                         :type "f"
+                         :value 1.0
+                         }
+                        :u_dist_reduction
+                        {
+                         :type "f"
+                         :value 30.0
+                         }
+                        :u_node_count 
+                        {
+                         :type "f"
+                         :value node-count
+                         }
+                        :u_texture_positions
                         {
                          :type "t"
                          :value nil
                          }
-                        :texture_velocities
+                        :u_texture_velocities
                         {
                          :type "t"
                          :value nil
                          }
-                        :resolution
+                        :u_resolution
                         {
                          :type "v2"
                          :value (new THREE.Vector2 tw th)
                          }
                         })
      uniforms-pass-through (clj->js {
-                            :pass_texture 
+                            :u_pass_texture 
                             {
                              :type "t"
                              :value nil
                             }
-                            :resolution
+                            :u_resolution
                             {
                              :type "v2"
                              :value (new three.Vector2 out-width out-height)
@@ -320,25 +417,25 @@
      _ (set! screen-camera.position.z 1)
      screen-geometry (new THREE.Geometry)
      screen-uniforms {
-                     :texture_positions
+                     :u_texture_positions
                      {
                       :type "t"
                       :value nil
                       }
-                     :resolution
+                     :u_resolution
                      {
                       :type "v2"
                       :value (new THREE.Vector2 window.innerWidth window.innerHeight)
                       }
                      }
      screen-attributes {
-                       :displacement_index
+                       :a_displacement_index
                        {
                         :type "v"
                         :value []
                         :needsUpdate true
                        }
-                       :pcolor
+                       :a_color
                        {
                         :type "c"
                         :value []
@@ -358,6 +455,100 @@
                           :blending THREE.AdditiveBlending
                           :depthWrite false
                           }))
+     screen-geometry (new THREE.BufferGeometry)
+     _ (-> screen-geometry
+         (.addAttribute
+           "position"
+           (new THREE.BufferAttribute 
+                (new js/Float32Array (* node-count 3))
+                3)))
+     _ (-> screen-geometry
+         (.addAttribute
+           "a_color"
+           (new THREE.BufferAttribute 
+                (new js/Float32Array (* node-count 3))
+                3)))
+     _ (-> screen-geometry
+         (.addAttribute
+           "a_displacement_index"
+           (new THREE.BufferAttribute
+                (new js/Float32Array (* node-count 2))
+                2)))
+     node-index-to-texture 
+      (fn [i]
+        (let
+          [xf (/ (mod i tw) tw)
+           y (js/Math.floor (/ i tw))
+           yf (/ y th)
+           ]
+          [xf yf]))
+     vertices (-> screen-geometry (.getAttribute "position"))
+     a_displacement_index (-> screen-geometry (.getAttribute "a_displacement_index"))
+     a_color (-> screen-geometry (.getAttribute "a_color"))
+     _ (println "vertices" (-> vertices .-count) (-> vertices .-itemSize))
+     _ (println "a_displ" (-> a_displacement_index .-count) (-> a_displacement_index .-itemSize))
+     _ (println "a_color" (-> a_color .-count) (-> a_color .-itemSize))
+     _ (doseq [i (range 0 node-count)]
+         (let
+           [[xf yf] (node-index-to-texture i)
+            r (js/Math.random)
+            g (js/Math.random)
+            b (js/Math.random)
+            ]
+           (-> vertices (.setXYZ i 0 0 0))
+           (-> a_displacement_index (.setXY i xf yf))
+           (-> a_color (.setXYZ i r g b)) 
+         ))
+     particle-cloud (new THREE.Points screen-geometry screen-material)
+     _ (-> screen-scene (.add particle-cloud))
+     _ (-> screen-scene (.add (new THREE.AmbientLight 0x444444)))
+     rt (new THREE.WebGLRenderTarget
+                        tw th
+                        #js 
+                        {
+                         :wrapS THREE.ClampToEdgeWrapping
+                         :wrapT THREE.ClampToEdgeWrapping
+                         :magFilter THREE.NearestFilter
+                         :minFilter THREE.NearestFilter
+                         :format THREE.RGBAFormat
+                         :type THREE.FloatType
+                         :stencilBuffer false
+                         }
+                        )
+     rt-positions1 (-> rt .clone)
+     rt-positions2 (-> rt .clone)
+     rt-velocities1 (-> rt .clone)
+     rt-velocities2 (-> rt .clone)
+     [t-positions t-velocities] (gen-texture node-count tw th)
+
+     ; copy positions texture
+     _ (aset uniforms-pass-through "u_pass_texture" "value" t-positions)
+     _ (aset mesh "material" pass-through-material)
+     _ (-> renderer (.render scene camera rt-positions1 true))
+     _ (-> renderer (.render scene camera rt-positions2 true))
+
+     ; copy velocities texture
+     _ (aset uniforms-pass-through "u_pass_texture" "value" t-velocities)
+     _ (aset mesh "material" pass-through-material)
+     _ (-> renderer (.render scene camera rt-velocities1 true))
+     _ (-> renderer (.render scene camera rt-velocities2 true))
+     options
+      {
+       :uniforms uniforms
+       :rt-positions1 rt-positions1
+       :rt-positions2 rt-positions2
+       :rt-velocities1 rt-velocities1
+       :rt-velocities2 rt-velocities2
+       :mesh mesh
+       :scene scene
+       :camera camera
+       :velocity-material velocity-material
+       :position-material position-material
+       :renderer renderer
+       :screen-scene screen-scene
+       :screen-camera screen-camera
+       }
+     _ (render2 options)
      ]
     )
   )
