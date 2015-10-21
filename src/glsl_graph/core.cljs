@@ -243,27 +243,28 @@
     (if 
       (not= o nil)
       (do
-        (aset (:uniforms o) "u_time_old" "value" (aget (:uniforms o) "u_time" "value"))
-        (aset (:uniforms o) "u_time" "value" (/ (-> (new js/Date) .getTime) 1000.0))
-        (aset (:uniforms o) "u_time_delta" "value" (- (aget (:uniforms o) "u_time" "value") (aget (:uniforms o) "u_time_old" "value")))
-        (aset (:uniforms o) "u_texture_positions" "value" (:rt-positions2 o))
-        (aset (:uniforms o) "u_texture_velocities" "value" (:rt-velocities2 o))
-        (aset (:uniforms o) "u_texture_edges" "value" (:t-edges o))
-        (aset (:uniforms o) "u_iteration" "value"
-              (+ 1 (aget (:uniforms o) "u_iteration" "value")))
+        (doseq [i (range 1)]
+          (aset (:uniforms o) "u_time_old" "value" (aget (:uniforms o) "u_time" "value"))
+          (aset (:uniforms o) "u_time" "value" (/ (-> (new js/Date) .getTime) 1000.0))
+          (aset (:uniforms o) "u_time_delta" "value" (- (aget (:uniforms o) "u_time" "value") (aget (:uniforms o) "u_time_old" "value")))
+          (aset (:uniforms o) "u_texture_positions" "value" (:rt-positions2 o))
+          (aset (:uniforms o) "u_texture_velocities" "value" (:rt-velocities2 o))
+          (aset (:uniforms o) "u_texture_edges" "value" (:t-edges o))
+          (aset (:uniforms o) "u_iteration" "value"
+                (+ 1 (aget (:uniforms o) "u_iteration" "value")))
 
-        ; update velocities
-        (aset (:mesh o) "material" (:velocity-material o))
-        (-> (:renderer o) (.render (:scene o) (:camera o) (:rt-velocities1 o) true))
+          ; update velocities
+          (aset (:mesh o) "material" (:velocity-material o))
+          (-> (:renderer o) (.render (:scene o) (:camera o) (:rt-velocities1 o) true))
 
-        ; update positions
-        (aset (:mesh o) "material" (:position-material o))
-        (-> (:renderer o) (.render (:scene o) (:camera o) (:rt-positions1 o) true))
+          ; update positions
+          (aset (:mesh o) "material" (:position-material o))
+          (-> (:renderer o) (.render (:scene o) (:camera o) (:rt-positions1 o) true))
 
-        (let
-          [physics-stats (data (:physics-stats c))]
-          (-> physics-stats .update)
-          )
+          (let
+            [physics-stats (data (:physics-stats c))]
+            (-> physics-stats .update)
+            ))
 
         ; swap buffers and iterate
         (let
@@ -501,7 +502,7 @@
               :EDGECOUNT edge-count
               :SQNODE node-sq
               :SQEDGE edge-sq
-              :USE3D "true"
+              :USE3D "false"
               })
      uniforms (clj->js {
                         :u_time

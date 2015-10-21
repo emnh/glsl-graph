@@ -1,10 +1,17 @@
 # glsl-graph
 
-FIXME: Write a one-line description of your library/project.
+GLSL / GPGPU Graph Rendering for WebGL, written in ClojureScript.
 
 ## Overview
 
-FIXME: Write a paragraph about the library/project and highlight its goals.
+[Demo](http://emnh.github.io/glsl-graph/)
+
+The layout is currently flawed compared to VivaGraph or D3, but at least the
+graph layout shows some of the graph structure. I hope someone can help me
+tweak it to make it better.
+
+Layout is currently O(E + N^2) since it does not use a quad tree, but seems
+to work fine with ~5000 nodes and ~10000 edges.
 
 ## Setup
 
@@ -34,6 +41,6 @@ get live reloading, nor a REPL.
 
 ## License
 
-Copyright © 2014 FIXME
+Copyright © 2015 Eivind Magnus Hvidevold
 
 Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.

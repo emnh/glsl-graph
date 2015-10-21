@@ -43,10 +43,12 @@ uniform float u_time;
 uniform float u_time_old;
 uniform float u_time_delta;
 uniform float u_spring_coefficient;
+uniform float u_spring_length;
 // why u_time_delta != u_time - u_time_old ?
 // #define TIMEDELTA ((u_time - u_time_old) * 60.0 / 1000.0)
 // #define TIMEDELTA ((u_time - u_time_old) * 60.0 / 1000.0)
-#define TIMEDELTA u_time_delta * 60.0
+#define TIMEDELTA 1.0
+//u_time_delta * 180.0
 #define SQNODEF float(SQNODE)
 #define SQEDGEF float(SQEDGE)
 #define NODECOUNTF float(NODECOUNT)
@@ -56,8 +58,7 @@ uniform float u_spring_coefficient;
 #define SCALE 1000.0
 
 vec2 swap(vec2 v) {
-  return v.yx;
-  //return v.xy;
+  return v.xy;
 }
 
 vec2 nodeIndexToPos(float i) {
@@ -89,7 +90,7 @@ vec3 gaussSeidel(float alpha, vec3 diff, float degree, float other_degree) {
   float x = diff.x;
   float y = diff.y;
   float z = diff.z;
-  float strength = 0.1;
+  float strength = 0.005;
   //float dist = 20.0;
   float dist = 50.0;
   vec3 delta = vec3(0.0);
@@ -132,7 +133,7 @@ vec3 calcSpring(float alpha, float degree, vec3 planetPos, float planetIndex) {
   vec3 delta = vec3(0.0);
 
   vec4 tpos = texture2D(u_texture_positions, nodeIndexToPos(planetIndex));
-  float other_degree = tpos.w * NODECOUNTF;
+  float other_degree = tpos.w * EDGECOUNTF;
   vec3 planet2Pos = scalePos(tpos.xyz);
   vec3 diff = planet2Pos - scalePos(planetPos);
   diff = project(diff);
@@ -143,11 +144,11 @@ vec3 calcSpring(float alpha, float degree, vec3 planetPos, float planetIndex) {
   float distSquare = dist * dist;
   float k = other_degree / (other_degree + degree);
 
-  // delta += gaussSeidel(alpha, diff, degree, other_degree);
+  //delta += gaussSeidel(alpha, diff, degree, other_degree);
 
   // spring force
-  float SPRING_LENGTH = 300.0;
-  float SPRING_COEFF = u_spring_coefficient * 1.0;
+  float SPRING_LENGTH = u_spring_length;
+  float SPRING_COEFF = u_spring_coefficient;
   /*if (dist < 0.1) {
     vec2 co = vec2(ITER, u_time);
     vec2 co2 = vec2(ITER, u_time) + planetPos.xy;
@@ -155,14 +156,15 @@ vec3 calcSpring(float alpha, float degree, vec3 planetPos, float planetIndex) {
     diff = vec3(rand(co), rand(co2), rand(co3));
     diff = project(diff);
   }*/
+  // float s = sign(dist - SPRING_LENGTH);
   if (dist < SPRING_LENGTH) {
     float X = attract(SPRING_LENGTH - dist);
     float F_spring = SPRING_COEFF * X;
-    // delta += -diff * F_spring * k;
+    delta += -diff * F_spring * k;
   } else if (dist > SPRING_LENGTH) {
     float X = attract(dist - SPRING_LENGTH);
     float F_spring = SPRING_COEFF * X;
-    // delta += diff * F_spring * k;
+    delta += diff * F_spring * k;
   }
 
   // Coloumb force
@@ -206,12 +208,20 @@ void main( void ) {
 
   vec3 delta = vec3(0.0);
 
+  float oldEdge = -1.0;
+  vec4 oldFourEdges = vec4(0.0);
   for (float i = 0.0; i < ITER; i += 1.0) {
     float edgeIndex = startEdge + mod(u_iteration * ITER + i, degree);
     float edge = floor(edgeIndex / 4.0);
     int off = int(floor(mod(edgeIndex, 4.0)));
-    // TODO: optimize texture lookup / 4
-    vec4 fourEdges = texture2D(u_texture_edges, edgeIndexToPos(edge));
+    vec4 fourEdges;
+    if (edge == oldEdge) {
+      fourEdges = oldFourEdges;
+    } else {
+      fourEdges = texture2D(u_texture_edges, edgeIndexToPos(edge));
+      oldFourEdges = fourEdges;
+      oldEdge = edge;
+    }
     float planetIndex;
     if (off == 0) {
       planetIndex = fourEdges[0];
@@ -276,7 +286,6 @@ uniform float u_spring_coefficient;
 #define SCALE 1000.0
 
 vec2 swap(vec2 v) {
-  //return v.yx;
   return v.xy;
 }
 
@@ -299,7 +308,8 @@ vec3 project(vec3 diff) {
     return diff;
   } else {
     // 2D
-    return vec3(diff.xy, 0.0);
+    //return vec3(diff.xy, 0.0);
+    return vec3(diff.x, 0.0, diff.z);
   }
 }
 
@@ -326,7 +336,7 @@ vec3 calcSpring(float degree, vec3 planetPos, float planetIndex) {
   vec3 delta = vec3(0.0);
 
   vec4 tpos = texture2D(u_texture_positions, nodeIndexToPos(planetIndex));
-  float other_degree = tpos.w * NODECOUNTF;
+  float other_degree = tpos.w * EDGECOUNTF;
   vec3 planet2Pos = scalePos(tpos.xyz);
   vec3 diff = planet2Pos - planetPos;
   diff = project(diff);
@@ -364,10 +374,9 @@ vec3 calcSpring(float degree, vec3 planetPos, float planetIndex) {
   //delta = clamp(delta, -1.0, 1.0);
 
   // Coloumb force
-  float ke = 8.987 * 10.0e9;
-  ke /= 10.0e9 / SCALE;
+  float ke = 0.001;
   vec3 F_C = -ke * diff;
-  // delta += F_C;
+  delta += F_C;
 
   // gravity
   // float F_gravity = -1.2 / (u_min_dist + distSquare) / u_dist_reduction / 10000.0;
@@ -382,7 +391,7 @@ vec3 calcGravity(float degree, vec3 planetPos, float planetIndex) {
   vec3 delta = vec3(0.0);
 
   vec4 tpos = texture2D(u_texture_positions, nodeIndexToPos(planetIndex));
-  float other_degree = tpos.w * NODECOUNTF;
+  float other_degree = tpos.w * EDGECOUNTF;
   vec3 planet2Pos = scalePos(tpos.xyz);
   vec3 diff = planet2Pos - planetPos;
   diff = project(diff);
@@ -390,7 +399,8 @@ vec3 calcGravity(float degree, vec3 planetPos, float planetIndex) {
   // forces
   float dist = length(diff);
   float distSquare = dist * dist;
-  float k = other_degree / (other_degree + degree);
+  //float k = other_degree / (other_degree + degree);
+  float k = 1.0 - other_degree / (other_degree + degree);
 
   /*if (dist < 0.1) {
     // TODO: not working
@@ -404,11 +414,14 @@ vec3 calcGravity(float degree, vec3 planetPos, float planetIndex) {
   }*/
 
   // gravity
-  const float G = -1.2 * 10.0;
+  const float G = -1.2 * 100.0;
   //float F_gravity = G / (u_min_dist + distSquare) / u_dist_reduction;
-  float F_gravity = G / (0.0001 + distSquare) / u_dist_reduction;
+  float F_gravity = G / (1.0 + distSquare) / u_dist_reduction;
   //delta += normalize(diff) * F_gravity;
-  delta += diff * F_gravity;
+  delta += diff * F_gravity * k;
+
+  // Coloumb force
+  // delta -= 0.001 * diff;
 
   // center
   if (
@@ -440,16 +453,24 @@ void main( void ) {
   float degree = tpos.w * EDGECOUNTF;
   float startEdge = tvel.w * EDGECOUNTF;
   float endEdge = startEdge + degree;
-  float alpha = max(pow(0.999, u_iteration), 1.0);
+  float alpha = max(pow(0.999, u_iteration), 0.0);
 
   vec3 delta = vec3(0.0);
 
+  float oldEdge = -1.0;
+  vec4 oldFourEdges = vec4(0.0);
   for (float i = 0.0; i < ITER; i += 1.0) {
     float edgeIndex = startEdge + mod(u_iteration * ITER + i, startEdge - endEdge);
     float edge = floor(edgeIndex / 4.0);
     int off = int(floor(mod(edgeIndex, 4.0)));
-    // TODO: optimize texture lookup / 4
-    vec4 fourEdges = texture2D(u_texture_edges, edgeIndexToPos(edge));
+    vec4 fourEdges;
+    if (edge == oldEdge) {
+      fourEdges = oldFourEdges;
+    } else {
+      fourEdges = texture2D(u_texture_edges, edgeIndexToPos(edge));
+      oldFourEdges = fourEdges;
+      oldEdge = edge;
+    }
     float planetIndex; // = fourEdges[0];
     if (off == 0) {
       planetIndex = fourEdges[0];
@@ -462,14 +483,15 @@ void main( void ) {
     }
     planetIndex *= NODECOUNTF;
     delta += calcSpring(degree, planetPos, planetIndex);
-    delta -= calcGravity(degree, planetPos, planetIndex);
+    //delta -= calcGravity(degree, planetPos, planetIndex);
   }
   for (float i = 0.0; i < NODECOUNTF; i += 1.0) {
     delta += calcGravity(degree, planetPos, i);
   }
   delta /= pow(SCALE, 1.0);
-  delta = clamp(delta, vec3(-1.0), vec3(1.0));
-  planetVelocity = clamp(planetVelocity, vec3(-1.0), vec3(1.0));
+  float clampSize = 1.0;
+  delta = clamp(delta, vec3(-clampSize), vec3(clampSize));
+  planetVelocity = clamp(planetVelocity, vec3(-clampSize), vec3(clampSize));
   
   planetVelocity = (planetVelocity * 0.9 + delta * alpha);
   planetVelocity = (planetVelocity + 1.0) / 2.0;
@@ -535,14 +557,9 @@ attribute vec2 a_displacement_index;
 //varying vec3 v_color;
 
 void main() {
-  //if (a_displacement_index == vec2(1.0, 1.0)) {
-  //  float infinity = a_displacement_index[0] / 0.;
-  //  gl_Position = vec4(vec3(infinity), 1.0);
-  //} else {
   vec3 planetPos = texture2D(u_texture_positions, a_displacement_index).xyz;
   planetPos = (planetPos * 2.0) - 1.0 + position;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(planetPos, 1.0);
-  //}
 }
   </script>
 
