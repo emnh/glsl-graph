@@ -4,3 +4,4 @@ window.Viva = require('vivagraphjs');
 window.sweetAlert = require('sweetalert');
 window.OrbitControls = require('three-orbit-controls')(window.THREE);
 window.Stats = require('stats.js');
+window.dat = require('dat-gui');

@@ -60,6 +60,47 @@
 (add-component system :render-stats (new-jsobj #(new js/Stats)))
 (add-component system :physics-stats (new-jsobj #(new js/Stats)))
 
+(add-component system :dat-gui (new-jsobj #(new js/dat.GUI)))
+
+(defcom
+  system
+  init-dat
+  [dat-gui get-graph]
+  []
+  (fn [c]
+    (m/mlet
+      [a (:render-options-ready get-graph)]
+      (let
+        [render-options @(:render-options get-graph)
+         uniforms (:uniforms render-options)
+         dat-gui (data dat-gui)
+         config #js 
+         {
+          :u_dist_reduction (* (aget uniforms "u_dist_reduction" "value") 1000)
+          :u_spring_coefficient (* (aget uniforms "u_spring_coefficient" "value") 1000)
+          :u_spring_length (* (aget uniforms "u_spring_length" "value") 1000)
+          }]
+        (println "adding prop")
+        (-> dat-gui 
+          (.add config "u_dist_reduction")
+          (.min 0.001)
+          (.step 0.001)
+          (.onChange (fn [value]
+                       (println "set value" value)
+                       (aset uniforms "u_dist_reduction" "value" (/ value 1000)))))
+        (-> dat-gui
+          (.add config "u_spring_coefficient")
+          (.onChange (fn [value]
+                       (aset uniforms "u_spring_coefficient" "value" (/ value 1000)))))
+        (-> dat-gui
+          (.add config "u_spring_length")
+          (.onChange (fn [value]
+                       (aset uniforms "u_spring_length" "value" (/ value 1000)))))
+        ))
+    c)
+  identity
+  )
+
 (defcom
   system
   init-stats
@@ -428,7 +469,7 @@
               :EDGECOUNT edge-count
               :SQNODE node-sq
               :SQEDGE edge-sq
-              :USE3D true
+              :USE3D "true"
               })
      uniforms (clj->js {
                         :u_time
@@ -456,10 +497,20 @@
                          :type "f"
                          :value 1.0
                          }
-                        :u_dist_reduction
+                        :u_spring_coefficient
+                        {
+                         :type "f"
+                         :value 0.100
+                         }
+                        :u_spring_length
                         {
                          :type "f"
                          :value 30.0
+                         }
+                        :u_dist_reduction
+                        {
+                         :type "f"
+                         :value (/ 30.0 1000.0)
                          }
                         :u_node_count 
                         {
@@ -742,15 +793,17 @@
   system
   get-graph
   [renderer scene camera render-stats init-scene]
-  [graph render-options]
+  [render-options-ready render-options]
   (fn [c]
     (let
-      [c (assoc c :render-options (atom nil))]
-      (->
-        (ajax graph-url "json")
-        (p/then (partial handle-graph c))
-        )
-        ;(p/catch handle-graph-error))
+      [c (assoc c :render-options (atom nil))
+       ready
+        (->
+          (ajax graph-url "json")
+          (p/then (partial handle-graph c)))
+          ;(p/catch handle-graph-error))
+       c (assoc c :render-options-ready ready)
+       ]
       c))
   identity
   )

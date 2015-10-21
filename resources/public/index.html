@@ -42,6 +42,7 @@ uniform float u_iteration;
 uniform float u_time;
 uniform float u_time_old;
 uniform float u_time_delta;
+uniform float u_spring_coefficient;
 // why u_time_delta != u_time - u_time_old ?
 // #define TIMEDELTA ((u_time - u_time_old) * 60.0 / 1000.0)
 // #define TIMEDELTA ((u_time - u_time_old) * 60.0 / 1000.0)
@@ -146,7 +147,7 @@ vec3 calcSpring(float alpha, float degree, vec3 planetPos, float planetIndex) {
 
   // spring force
   float SPRING_LENGTH = 300.0;
-  float SPRING_COEFF = 0.0008 / SCALE;
+  float SPRING_COEFF = u_spring_coefficient / SCALE;
   /*if (dist < 0.1) {
     vec2 co = vec2(ITER, u_time);
     vec2 co2 = vec2(ITER, u_time) + planetPos.xy;
@@ -261,6 +262,9 @@ uniform float u_dist_reduction;
 uniform float u_iteration;
 uniform float u_time;
 uniform float u_time_old;
+uniform float u_time_delta;
+uniform float u_spring_length;
+uniform float u_spring_coefficient;
 #define SQNODEF float(SQNODE)
 #define SQEDGEF float(SQEDGE)
 #define NODECOUNTF float(NODECOUNT)
@@ -341,8 +345,8 @@ vec3 calcSpring(float degree, vec3 planetPos, float planetIndex) {
   }*/
 
   // spring force
-  float SPRING_LENGTH = 30.0;
-  float SPRING_COEFF = 0.0008;
+  float SPRING_LENGTH = u_spring_length;
+  float SPRING_COEFF = u_spring_coefficient;
   float k1 = 1.0;
   if (dist < SPRING_LENGTH) {
     float X = attract(k1 * (SPRING_LENGTH - dist));

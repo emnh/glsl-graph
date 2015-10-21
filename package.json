@@ -14,7 +14,8 @@
     "vivagraphjs": "0.8.1",
     "sweetalert": "1.1.0",
     "three-orbit-controls": "mattdesl/three-orbit-controls#master",
-    "stats.js": "mrdoob/stats.js#master"
+    "stats.js": "mrdoob/stats.js#master",
+    "dat-gui": "0.5.0"
   },
   "devDependencies": {
     "source-map-support": "0.2.8"
