@@ -80,7 +80,6 @@
           :u_spring_coefficient (* (aget uniforms "u_spring_coefficient" "value") 1000)
           :u_spring_length (* (aget uniforms "u_spring_length" "value") 1000)
           }]
-        (println "adding prop")
         (-> dat-gui 
           (.add config "u_dist_reduction")
           (.min 0.001)
@@ -230,7 +229,7 @@
     c)
   )
 
-(defn render-loop
+(defn render-loop-compute
   [c o]
   (let
     [camera (:camera (:camera c))
@@ -261,15 +260,9 @@
         (aset (:mesh o) "material" (:position-material o))
         (-> (:renderer o) (.render (:scene o) (:camera o) (:rt-positions1 o) true))
 
-        ; render to screen
-        (aset (:screen-uniforms o) "u_texture_positions" "value" (:rt-positions1 o))
-        (-> (:renderer o) (.setSize window.innerWidth window.innerHeight))
-        (-> (:screen-camera o) .-aspect (set! (/ window.innerWidth window.innerHeight)))
-        (-> (:renderer o) (.render (:screen-scene o) (:screen-camera o)))
-
         (let
-          [render-stats (data (get-in o [:c :render-stats]))]
-          (-> render-stats .update)
+          [physics-stats (data (:physics-stats c))]
+          (-> physics-stats .update)
           )
 
         ; swap buffers and iterate
@@ -280,9 +273,47 @@
                (assoc :rt-velocities1 (:rt-velocities2 o))
                (assoc :rt-velocities2 (:rt-velocities1 o))
                )]
-          (if running (js/requestAnimationFrame (partial render-loop c o)))
+          (if running (js/setTimeout (partial render-loop-compute c o) 0))
           ))
-      (if running (js/requestAnimationFrame (partial render-loop c nil)))
+      (if running (js/setTimeout (partial render-loop-compute c nil) 0))
+      )
+    )
+  )
+
+(defn render-loop-screen
+  [c o]
+  (let
+    [camera (:camera (:camera c))
+     scene (data (:scene c))
+     renderer (data (:renderer c))
+     running @(:running c)
+     o (if (= o nil) 
+         @(get-in c [:get-graph :render-options])
+         o)
+     ]
+    (if 
+      (not= o nil)
+      (do
+        ; render to screen
+        (aset (:screen-uniforms o) "u_texture_positions" "value" (:rt-positions1 o))
+        (-> (:renderer o) (.setSize window.innerWidth window.innerHeight))
+        (-> (:screen-camera o) .-aspect (set! (/ window.innerWidth window.innerHeight)))
+        (-> (:renderer o) (.render (:screen-scene o) (:screen-camera o)))
+
+        (let
+          [render-stats (data (:render-stats c))]
+          (-> render-stats .update)
+          )
+
+        ; swap buffers and iterate
+        (let
+          [o (-> o
+               (assoc :rt-positions1 (:rt-positions2 o))
+               (assoc :rt-positions2 (:rt-positions1 o))
+               )]
+          (if running (js/requestAnimationFrame (partial render-loop-screen c o)))
+          ))
+      (if running (js/requestAnimationFrame (partial render-loop-screen c nil)))
       )
     )
   )
@@ -290,12 +321,13 @@
 (defcom
   system
   render-loop
-  [renderer camera scene init-scene get-graph]
+  [renderer camera scene init-scene get-graph render-stats physics-stats]
   [running]
   (fn [c] 
     (let 
       [c (assoc c :running (atom true))]
-      (render-loop c nil)
+      (render-loop-compute c nil)
+      (render-loop-screen c nil)
       c))
   (fn [c]
     (if
@@ -792,7 +824,7 @@
 (defcom
   system
   get-graph
-  [renderer scene camera render-stats init-scene]
+  [renderer scene camera init-scene]
   [render-options-ready render-options]
   (fn [c]
     (let
