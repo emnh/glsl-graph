@@ -1,0 +1,18 @@
+goog.addDependency("base.js", ['goog'], []);
+goog.addDependency("../cljs/core.js", ['cljs.core'], ['goog.string', 'goog.object', 'goog.string.StringBuffer', 'goog.array']);
+goog.addDependency("../promesa/protocols.js", ['promesa.protocols'], ['cljs.core']);
+goog.addDependency("../cats/protocols.js", ['cats.protocols'], ['cljs.core']);
+goog.addDependency("../cats/context.js", ['cats.context'], ['cljs.core', 'cats.protocols']);
+goog.addDependency("../bluebird.js", ['org.bluebird'], []);
+goog.addDependency("../clojure/set.js", ['clojure.set'], ['cljs.core']);
+goog.addDependency("../cats/core.js", ['cats.core'], ['cats.context', 'cljs.core', 'cats.protocols', 'clojure.set']);
+goog.addDependency("../promesa/core.js", ['promesa.core'], ['promesa.protocols', 'cats.context', 'cljs.core', 'cats.protocols', 'org.bluebird', 'cats.core']);
+goog.addDependency("../cljs/reader.js", ['cljs.reader'], ['goog.string', 'cljs.core', 'goog.string.StringBuffer']);
+goog.addDependency("../tailrecursion/priority_map.js", ['tailrecursion.priority_map'], ['cljs.core', 'cljs.reader']);
+goog.addDependency("../javelin/core.js", ['javelin.core'], ['cljs.core', 'tailrecursion.priority_map']);
+goog.addDependency("../clojure/string.js", ['clojure.string'], ['goog.string', 'cljs.core', 'goog.string.StringBuffer']);
+goog.addDependency("../jayq/core.js", ['jayq.core'], ['cljs.core', 'clojure.string', 'cljs.reader']);
+goog.addDependency("../com/stuartsierra/component/platform.js", ['com.stuartsierra.component.platform'], ['cljs.core']);
+goog.addDependency("../com/stuartsierra/dependency.js", ['com.stuartsierra.dependency'], ['cljs.core', 'clojure.set']);
+goog.addDependency("../com/stuartsierra/component.js", ['com.stuartsierra.component'], ['cljs.core', 'com.stuartsierra.component.platform', 'com.stuartsierra.dependency']);
+goog.addDependency("../glsl_graph/core.js", ['glsl_graph.core'], ['promesa.core', 'javelin.core', 'cljs.core', 'clojure.set', 'cats.core', 'jayq.core', 'com.stuartsierra.component']);

@@ -1,0 +1,9 @@
+/* some style */
+
+#graphVisualization { width: 100%;}
+.whole-height { position: absolute; bottom: 0px; top: 0px;margin-bottom: 0px; margin-left: 0px;}
+
+body {
+  margin: 0px;
+  overflow: hidden;
+}
