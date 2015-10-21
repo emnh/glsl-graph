@@ -1,6 +1,6 @@
 # glsl-graph
 
-GLSL / GPGPU Graph Rendering for WebGL, written in ClojureScript.
+WebGL GPGPU Graph Layout, written in ClojureScript.
 
 ## Overview
 
