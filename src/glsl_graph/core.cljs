@@ -203,7 +203,9 @@
     (if 
       (not= o nil)
       (do
-        (aset (:uniforms o) "u_time" "value" (-> (new js/Date) .getTime))
+        (aset (:uniforms o) "u_time_old" "value" (aget (:uniforms o) "u_time" "value"))
+        (aset (:uniforms o) "u_time" "value" (/ (-> (new js/Date) .getTime) 1000.0))
+        (aset (:uniforms o) "u_time_delta" "value" (- (aget (:uniforms o) "u_time" "value") (aget (:uniforms o) "u_time_old" "value")))
         (aset (:uniforms o) "u_texture_positions" "value" (:rt-positions2 o))
         (aset (:uniforms o) "u_texture_velocities" "value" (:rt-velocities2 o))
         (aset (:uniforms o) "u_texture_edges" "value" (:t-edges o))
@@ -290,14 +292,14 @@
          (let
            [j (* i rgba-size)]
            (let
-             [sz 0
+             [sz 1
               fixed 0.5
               x (* sz (js/Math.random))
               y (* sz (js/Math.random))
               z (* sz (js/Math.random))
-              x fixed
-              y fixed
-              z fixed
+;              x fixed
+;              y fixed
+;              z fixed
               w2 (nth node-neighbours-startpos (+ i 1))
               w1 (nth node-neighbours-startpos (+ i 0))
               w (- w2 w1)
@@ -309,9 +311,13 @@
              (aset raw-positions (+ j 3) w)
              )
            (let
-             [x (js/Math.random)
+             [fixed 0.5
+              x (js/Math.random)
               y (js/Math.random)
               z (js/Math.random)
+              x fixed
+              y fixed
+              z fixed
               w (nth node-neighbours-startpos (+ i 0))
               w (/ w edge-count)
               ]
@@ -422,11 +428,20 @@
               :EDGECOUNT edge-count
               :SQNODE node-sq
               :SQEDGE edge-sq
-              :FLOATSPERPLANET floats-per-planet
               :USE3D true
               })
      uniforms (clj->js {
                         :u_time
+                        {
+                         :type "f"
+                         :value (/ (-> (new js/Date) .getTime) 1000.0)
+                         }
+                        :u_time_old
+                        {
+                         :type "f"
+                         :value 0.0
+                         }
+                        :u_time_delta
                         {
                          :type "f"
                          :value 0.0
