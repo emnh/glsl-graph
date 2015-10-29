@@ -401,13 +401,15 @@
              (aset raw-velocities (+ j 3) w)
              )
            ))
+     _ (doseq [i (range (* ew eh))]
+         (aset raw-edges i 100.0))
      _ (doseq [i (range edge-count)]
          (let
           [
            x (nth node-neighbours-flat i)
            x (/ x node-count)
            ]
-          (aset raw-edges i x)
+          (aset raw-edges (* i 1) x)
           ))
      new-texture 
       #(let
@@ -533,17 +535,17 @@
                         :u_spring_coefficient
                         {
                          :type "f"
-                         :value 0.100
+                         :value 100.0
                          }
                         :u_spring_length
                         {
                          :type "f"
-                         :value 30.0
+                         :value 3.0
                          }
                         :u_dist_reduction
                         {
                          :type "f"
-                         :value (/ 30.0 1000.0)
+                         :value (/ 30.0 1000000.0)
                          }
                         :u_node_count 
                         {
@@ -626,7 +628,7 @@
      screen-scene (new THREE.Scene)
      screen-camera (new THREE.PerspectiveCamera 
                         75 (/ window.innerWidth window.innerHeight) 0.1 1000)
-     _ (set! screen-camera.position.y 1)
+     _ (set! screen-camera.position.z 0.2)
      ;controls (new js/OrbitControls screen-camera (-> renderer .-domElement))
      controls (new js/OrbitControls screen-camera)
      screen-geometry (new THREE.Geometry)

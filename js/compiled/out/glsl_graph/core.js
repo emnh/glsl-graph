@@ -2174,145 +2174,56 @@ var rgba_size = (4);
 var raw_positions = (new Float32Array(((tw * th) * rgba_size)));
 var raw_velocities = (new Float32Array(((tw * th) * rgba_size)));
 var raw_edges = (new Float32Array(((ew * eh) * rgba_size)));
-var _ = (function (){var seq__7750 = cljs.core.seq.call(null,cljs.core.range.call(null,node_count));
-var chunk__7751 = null;
-var count__7752 = (0);
-var i__7753 = (0);
-while(true){
-if((i__7753 < count__7752)){
-var i = cljs.core._nth.call(null,chunk__7751,i__7753);
-var j_7759 = (i * rgba_size);
-var sz_7760 = (1);
-var fixed_7761 = 0.5;
-var x_7762 = (sz_7760 * Math.random());
-var y_7763 = (sz_7760 * Math.random());
-var z_7764 = (sz_7760 * Math.random());
-var w2_7765 = cljs.core.nth.call(null,node_neighbours_startpos,(i + (1)));
-var w1_7766 = cljs.core.nth.call(null,node_neighbours_startpos,(i + (0)));
-var w_7767 = (w2_7765 - w1_7766);
-var w_7768__$1 = (w_7767 / edge_count);
-(raw_positions[(j_7759 + (0))] = x_7762);
-
-(raw_positions[(j_7759 + (1))] = y_7763);
-
-(raw_positions[(j_7759 + (2))] = z_7764);
-
-(raw_positions[(j_7759 + (3))] = w_7768__$1);
-
-var fixed_7769 = 0.5;
-var x_7770 = Math.random();
-var y_7771 = Math.random();
-var z_7772 = Math.random();
-var x_7773__$1 = fixed_7769;
-var y_7774__$1 = fixed_7769;
-var z_7775__$1 = fixed_7769;
-var w_7776 = cljs.core.nth.call(null,node_neighbours_startpos,(i + (0)));
-var w_7777__$1 = (w_7776 / edge_count);
-(raw_velocities[(j_7759 + (0))] = x_7773__$1);
-
-(raw_velocities[(j_7759 + (1))] = y_7774__$1);
-
-(raw_velocities[(j_7759 + (2))] = z_7775__$1);
-
-(raw_velocities[(j_7759 + (3))] = w_7777__$1);
-
-var G__7778 = seq__7750;
-var G__7779 = chunk__7751;
-var G__7780 = count__7752;
-var G__7781 = (i__7753 + (1));
-seq__7750 = G__7778;
-chunk__7751 = G__7779;
-count__7752 = G__7780;
-i__7753 = G__7781;
-continue;
-} else {
-var temp__4425__auto__ = cljs.core.seq.call(null,seq__7750);
-if(temp__4425__auto__){
-var seq__7750__$1 = temp__4425__auto__;
-if(cljs.core.chunked_seq_QMARK_.call(null,seq__7750__$1)){
-var c__5762__auto__ = cljs.core.chunk_first.call(null,seq__7750__$1);
-var G__7782 = cljs.core.chunk_rest.call(null,seq__7750__$1);
-var G__7783 = c__5762__auto__;
-var G__7784 = cljs.core.count.call(null,c__5762__auto__);
-var G__7785 = (0);
-seq__7750 = G__7782;
-chunk__7751 = G__7783;
-count__7752 = G__7784;
-i__7753 = G__7785;
-continue;
-} else {
-var i = cljs.core.first.call(null,seq__7750__$1);
-var j_7786 = (i * rgba_size);
-var sz_7787 = (1);
-var fixed_7788 = 0.5;
-var x_7789 = (sz_7787 * Math.random());
-var y_7790 = (sz_7787 * Math.random());
-var z_7791 = (sz_7787 * Math.random());
-var w2_7792 = cljs.core.nth.call(null,node_neighbours_startpos,(i + (1)));
-var w1_7793 = cljs.core.nth.call(null,node_neighbours_startpos,(i + (0)));
-var w_7794 = (w2_7792 - w1_7793);
-var w_7795__$1 = (w_7794 / edge_count);
-(raw_positions[(j_7786 + (0))] = x_7789);
-
-(raw_positions[(j_7786 + (1))] = y_7790);
-
-(raw_positions[(j_7786 + (2))] = z_7791);
-
-(raw_positions[(j_7786 + (3))] = w_7795__$1);
-
-var fixed_7796 = 0.5;
-var x_7797 = Math.random();
-var y_7798 = Math.random();
-var z_7799 = Math.random();
-var x_7800__$1 = fixed_7796;
-var y_7801__$1 = fixed_7796;
-var z_7802__$1 = fixed_7796;
-var w_7803 = cljs.core.nth.call(null,node_neighbours_startpos,(i + (0)));
-var w_7804__$1 = (w_7803 / edge_count);
-(raw_velocities[(j_7786 + (0))] = x_7800__$1);
-
-(raw_velocities[(j_7786 + (1))] = y_7801__$1);
-
-(raw_velocities[(j_7786 + (2))] = z_7802__$1);
-
-(raw_velocities[(j_7786 + (3))] = w_7804__$1);
-
-var G__7805 = cljs.core.next.call(null,seq__7750__$1);
-var G__7806 = null;
-var G__7807 = (0);
-var G__7808 = (0);
-seq__7750 = G__7805;
-chunk__7751 = G__7806;
-count__7752 = G__7807;
-i__7753 = G__7808;
-continue;
-}
-} else {
-return null;
-}
-}
-break;
-}
-})();
-var ___$1 = (function (){var seq__7754 = cljs.core.seq.call(null,cljs.core.range.call(null,edge_count));
+var _ = (function (){var seq__7754 = cljs.core.seq.call(null,cljs.core.range.call(null,node_count));
 var chunk__7755 = null;
 var count__7756 = (0);
 var i__7757 = (0);
 while(true){
 if((i__7757 < count__7756)){
 var i = cljs.core._nth.call(null,chunk__7755,i__7757);
-var x_7809 = cljs.core.nth.call(null,node_neighbours_flat,i);
-var x_7810__$1 = (x_7809 / node_count);
-(raw_edges[i] = x_7810__$1);
+var j_7767 = (i * rgba_size);
+var sz_7768 = (1);
+var fixed_7769 = 0.5;
+var x_7770 = (sz_7768 * Math.random());
+var y_7771 = (sz_7768 * Math.random());
+var z_7772 = (sz_7768 * Math.random());
+var w2_7773 = cljs.core.nth.call(null,node_neighbours_startpos,(i + (1)));
+var w1_7774 = cljs.core.nth.call(null,node_neighbours_startpos,(i + (0)));
+var w_7775 = (w2_7773 - w1_7774);
+var w_7776__$1 = (w_7775 / edge_count);
+(raw_positions[(j_7767 + (0))] = x_7770);
 
-var G__7811 = seq__7754;
-var G__7812 = chunk__7755;
-var G__7813 = count__7756;
-var G__7814 = (i__7757 + (1));
-seq__7754 = G__7811;
-chunk__7755 = G__7812;
-count__7756 = G__7813;
-i__7757 = G__7814;
+(raw_positions[(j_7767 + (1))] = y_7771);
+
+(raw_positions[(j_7767 + (2))] = z_7772);
+
+(raw_positions[(j_7767 + (3))] = w_7776__$1);
+
+var fixed_7777 = 0.5;
+var x_7778 = Math.random();
+var y_7779 = Math.random();
+var z_7780 = Math.random();
+var x_7781__$1 = fixed_7777;
+var y_7782__$1 = fixed_7777;
+var z_7783__$1 = fixed_7777;
+var w_7784 = cljs.core.nth.call(null,node_neighbours_startpos,(i + (0)));
+var w_7785__$1 = (w_7784 / edge_count);
+(raw_velocities[(j_7767 + (0))] = x_7781__$1);
+
+(raw_velocities[(j_7767 + (1))] = y_7782__$1);
+
+(raw_velocities[(j_7767 + (2))] = z_7783__$1);
+
+(raw_velocities[(j_7767 + (3))] = w_7785__$1);
+
+var G__7786 = seq__7754;
+var G__7787 = chunk__7755;
+var G__7788 = count__7756;
+var G__7789 = (i__7757 + (1));
+seq__7754 = G__7786;
+chunk__7755 = G__7787;
+count__7756 = G__7788;
+i__7757 = G__7789;
 continue;
 } else {
 var temp__4425__auto__ = cljs.core.seq.call(null,seq__7754);
@@ -2320,29 +2231,60 @@ if(temp__4425__auto__){
 var seq__7754__$1 = temp__4425__auto__;
 if(cljs.core.chunked_seq_QMARK_.call(null,seq__7754__$1)){
 var c__5762__auto__ = cljs.core.chunk_first.call(null,seq__7754__$1);
-var G__7815 = cljs.core.chunk_rest.call(null,seq__7754__$1);
-var G__7816 = c__5762__auto__;
-var G__7817 = cljs.core.count.call(null,c__5762__auto__);
-var G__7818 = (0);
-seq__7754 = G__7815;
-chunk__7755 = G__7816;
-count__7756 = G__7817;
-i__7757 = G__7818;
+var G__7790 = cljs.core.chunk_rest.call(null,seq__7754__$1);
+var G__7791 = c__5762__auto__;
+var G__7792 = cljs.core.count.call(null,c__5762__auto__);
+var G__7793 = (0);
+seq__7754 = G__7790;
+chunk__7755 = G__7791;
+count__7756 = G__7792;
+i__7757 = G__7793;
 continue;
 } else {
 var i = cljs.core.first.call(null,seq__7754__$1);
-var x_7819 = cljs.core.nth.call(null,node_neighbours_flat,i);
-var x_7820__$1 = (x_7819 / node_count);
-(raw_edges[i] = x_7820__$1);
+var j_7794 = (i * rgba_size);
+var sz_7795 = (1);
+var fixed_7796 = 0.5;
+var x_7797 = (sz_7795 * Math.random());
+var y_7798 = (sz_7795 * Math.random());
+var z_7799 = (sz_7795 * Math.random());
+var w2_7800 = cljs.core.nth.call(null,node_neighbours_startpos,(i + (1)));
+var w1_7801 = cljs.core.nth.call(null,node_neighbours_startpos,(i + (0)));
+var w_7802 = (w2_7800 - w1_7801);
+var w_7803__$1 = (w_7802 / edge_count);
+(raw_positions[(j_7794 + (0))] = x_7797);
 
-var G__7821 = cljs.core.next.call(null,seq__7754__$1);
-var G__7822 = null;
-var G__7823 = (0);
-var G__7824 = (0);
-seq__7754 = G__7821;
-chunk__7755 = G__7822;
-count__7756 = G__7823;
-i__7757 = G__7824;
+(raw_positions[(j_7794 + (1))] = y_7798);
+
+(raw_positions[(j_7794 + (2))] = z_7799);
+
+(raw_positions[(j_7794 + (3))] = w_7803__$1);
+
+var fixed_7804 = 0.5;
+var x_7805 = Math.random();
+var y_7806 = Math.random();
+var z_7807 = Math.random();
+var x_7808__$1 = fixed_7804;
+var y_7809__$1 = fixed_7804;
+var z_7810__$1 = fixed_7804;
+var w_7811 = cljs.core.nth.call(null,node_neighbours_startpos,(i + (0)));
+var w_7812__$1 = (w_7811 / edge_count);
+(raw_velocities[(j_7794 + (0))] = x_7808__$1);
+
+(raw_velocities[(j_7794 + (1))] = y_7809__$1);
+
+(raw_velocities[(j_7794 + (2))] = z_7810__$1);
+
+(raw_velocities[(j_7794 + (3))] = w_7812__$1);
+
+var G__7813 = cljs.core.next.call(null,seq__7754__$1);
+var G__7814 = null;
+var G__7815 = (0);
+var G__7816 = (0);
+seq__7754 = G__7813;
+chunk__7755 = G__7814;
+count__7756 = G__7815;
+i__7757 = G__7816;
 continue;
 }
 } else {
@@ -2352,21 +2294,133 @@ return null;
 break;
 }
 })();
-var new_texture = ((function (rgba_size,raw_positions,raw_velocities,raw_edges,_,___$1){
+var ___$1 = (function (){var seq__7758 = cljs.core.seq.call(null,cljs.core.range.call(null,(ew * eh)));
+var chunk__7759 = null;
+var count__7760 = (0);
+var i__7761 = (0);
+while(true){
+if((i__7761 < count__7760)){
+var i = cljs.core._nth.call(null,chunk__7759,i__7761);
+(raw_edges[i] = 100.0);
+
+var G__7817 = seq__7758;
+var G__7818 = chunk__7759;
+var G__7819 = count__7760;
+var G__7820 = (i__7761 + (1));
+seq__7758 = G__7817;
+chunk__7759 = G__7818;
+count__7760 = G__7819;
+i__7761 = G__7820;
+continue;
+} else {
+var temp__4425__auto__ = cljs.core.seq.call(null,seq__7758);
+if(temp__4425__auto__){
+var seq__7758__$1 = temp__4425__auto__;
+if(cljs.core.chunked_seq_QMARK_.call(null,seq__7758__$1)){
+var c__5762__auto__ = cljs.core.chunk_first.call(null,seq__7758__$1);
+var G__7821 = cljs.core.chunk_rest.call(null,seq__7758__$1);
+var G__7822 = c__5762__auto__;
+var G__7823 = cljs.core.count.call(null,c__5762__auto__);
+var G__7824 = (0);
+seq__7758 = G__7821;
+chunk__7759 = G__7822;
+count__7760 = G__7823;
+i__7761 = G__7824;
+continue;
+} else {
+var i = cljs.core.first.call(null,seq__7758__$1);
+(raw_edges[i] = 100.0);
+
+var G__7825 = cljs.core.next.call(null,seq__7758__$1);
+var G__7826 = null;
+var G__7827 = (0);
+var G__7828 = (0);
+seq__7758 = G__7825;
+chunk__7759 = G__7826;
+count__7760 = G__7827;
+i__7761 = G__7828;
+continue;
+}
+} else {
+return null;
+}
+}
+break;
+}
+})();
+var ___$2 = (function (){var seq__7762 = cljs.core.seq.call(null,cljs.core.range.call(null,edge_count));
+var chunk__7763 = null;
+var count__7764 = (0);
+var i__7765 = (0);
+while(true){
+if((i__7765 < count__7764)){
+var i = cljs.core._nth.call(null,chunk__7763,i__7765);
+var x_7829 = cljs.core.nth.call(null,node_neighbours_flat,i);
+var x_7830__$1 = (x_7829 / node_count);
+(raw_edges[(i * (1))] = x_7830__$1);
+
+var G__7831 = seq__7762;
+var G__7832 = chunk__7763;
+var G__7833 = count__7764;
+var G__7834 = (i__7765 + (1));
+seq__7762 = G__7831;
+chunk__7763 = G__7832;
+count__7764 = G__7833;
+i__7765 = G__7834;
+continue;
+} else {
+var temp__4425__auto__ = cljs.core.seq.call(null,seq__7762);
+if(temp__4425__auto__){
+var seq__7762__$1 = temp__4425__auto__;
+if(cljs.core.chunked_seq_QMARK_.call(null,seq__7762__$1)){
+var c__5762__auto__ = cljs.core.chunk_first.call(null,seq__7762__$1);
+var G__7835 = cljs.core.chunk_rest.call(null,seq__7762__$1);
+var G__7836 = c__5762__auto__;
+var G__7837 = cljs.core.count.call(null,c__5762__auto__);
+var G__7838 = (0);
+seq__7762 = G__7835;
+chunk__7763 = G__7836;
+count__7764 = G__7837;
+i__7765 = G__7838;
+continue;
+} else {
+var i = cljs.core.first.call(null,seq__7762__$1);
+var x_7839 = cljs.core.nth.call(null,node_neighbours_flat,i);
+var x_7840__$1 = (x_7839 / node_count);
+(raw_edges[(i * (1))] = x_7840__$1);
+
+var G__7841 = cljs.core.next.call(null,seq__7762__$1);
+var G__7842 = null;
+var G__7843 = (0);
+var G__7844 = (0);
+seq__7762 = G__7841;
+chunk__7763 = G__7842;
+count__7764 = G__7843;
+i__7765 = G__7844;
+continue;
+}
+} else {
+return null;
+}
+}
+break;
+}
+})();
+var new_texture = ((function (rgba_size,raw_positions,raw_velocities,raw_edges,_,___$1,___$2){
 return (function (p1__7738_SHARP_,p2__7739_SHARP_,p3__7740_SHARP_){
 var t = (new glsl_graph.core.THREE.DataTexture(p1__7738_SHARP_,p2__7739_SHARP_,p3__7740_SHARP_,glsl_graph.core.THREE.RGBAFormat,glsl_graph.core.THREE.FloatType));
-var G__7758_7825 = t;
-(G__7758_7825["minFilter"] = glsl_graph.core.THREE.NearestFilter);
+var G__7766_7845 = t;
+(G__7766_7845["minFilter"] = glsl_graph.core.THREE.NearestFilter);
 
-(G__7758_7825["wrapS"] = glsl_graph.core.THREE.ClampToEdgeWrapping);
+(G__7766_7845["wrapS"] = glsl_graph.core.THREE.ClampToEdgeWrapping);
 
-(G__7758_7825["wrapT"] = glsl_graph.core.THREE.ClampToEdgeWrapping);
+(G__7766_7845["wrapT"] = glsl_graph.core.THREE.ClampToEdgeWrapping);
 
-(G__7758_7825["needsUpdate"] = true);
+(G__7766_7845["needsUpdate"] = true);
 
 
 return t;
-});})(rgba_size,raw_positions,raw_velocities,raw_edges,_,___$1))
+});})(rgba_size,raw_positions,raw_velocities,raw_edges,_,___$1,___$2))
 ;
 var t_positions = new_texture.call(null,raw_positions,tw,th);
 var t_velocities = new_texture.call(null,raw_velocities,tw,th);
@@ -2378,26 +2432,26 @@ var graph_data__$1 = cljs.core.js__GT_clj.call(null,graph_data,new cljs.core.Key
 var records_per_edge = new cljs.core.Keyword(null,"recordsPerEdge","recordsPerEdge",924648902).cljs$core$IFn$_invoke$arity$1(graph_data__$1);
 var links = new cljs.core.Keyword(null,"links","links",-654507394).cljs$core$IFn$_invoke$arity$1(graph_data__$1);
 var edges = (function (){var iter__5731__auto__ = ((function (graph_data__$1,records_per_edge,links){
-return (function glsl_graph$core$handle_graph_$_iter__7869(s__7870){
+return (function glsl_graph$core$handle_graph_$_iter__7889(s__7890){
 return (new cljs.core.LazySeq(null,((function (graph_data__$1,records_per_edge,links){
 return (function (){
-var s__7870__$1 = s__7870;
+var s__7890__$1 = s__7890;
 while(true){
-var temp__4425__auto__ = cljs.core.seq.call(null,s__7870__$1);
+var temp__4425__auto__ = cljs.core.seq.call(null,s__7890__$1);
 if(temp__4425__auto__){
-var s__7870__$2 = temp__4425__auto__;
-if(cljs.core.chunked_seq_QMARK_.call(null,s__7870__$2)){
-var c__5729__auto__ = cljs.core.chunk_first.call(null,s__7870__$2);
+var s__7890__$2 = temp__4425__auto__;
+if(cljs.core.chunked_seq_QMARK_.call(null,s__7890__$2)){
+var c__5729__auto__ = cljs.core.chunk_first.call(null,s__7890__$2);
 var size__5730__auto__ = cljs.core.count.call(null,c__5729__auto__);
-var b__7872 = cljs.core.chunk_buffer.call(null,size__5730__auto__);
-if((function (){var i__7871 = (0);
+var b__7892 = cljs.core.chunk_buffer.call(null,size__5730__auto__);
+if((function (){var i__7891 = (0);
 while(true){
-if((i__7871 < size__5730__auto__)){
-var i = cljs.core._nth.call(null,c__5729__auto__,i__7871);
-cljs.core.chunk_append.call(null,b__7872,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.get.call(null,links,i),cljs.core.get.call(null,links,(i + (1)))], null));
+if((i__7891 < size__5730__auto__)){
+var i = cljs.core._nth.call(null,c__5729__auto__,i__7891);
+cljs.core.chunk_append.call(null,b__7892,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.get.call(null,links,i),cljs.core.get.call(null,links,(i + (1)))], null));
 
-var G__7905 = (i__7871 + (1));
-i__7871 = G__7905;
+var G__7925 = (i__7891 + (1));
+i__7891 = G__7925;
 continue;
 } else {
 return true;
@@ -2405,13 +2459,13 @@ return true;
 break;
 }
 })()){
-return cljs.core.chunk_cons.call(null,cljs.core.chunk.call(null,b__7872),glsl_graph$core$handle_graph_$_iter__7869.call(null,cljs.core.chunk_rest.call(null,s__7870__$2)));
+return cljs.core.chunk_cons.call(null,cljs.core.chunk.call(null,b__7892),glsl_graph$core$handle_graph_$_iter__7889.call(null,cljs.core.chunk_rest.call(null,s__7890__$2)));
 } else {
-return cljs.core.chunk_cons.call(null,cljs.core.chunk.call(null,b__7872),null);
+return cljs.core.chunk_cons.call(null,cljs.core.chunk.call(null,b__7892),null);
 }
 } else {
-var i = cljs.core.first.call(null,s__7870__$2);
-return cljs.core.cons.call(null,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.get.call(null,links,i),cljs.core.get.call(null,links,(i + (1)))], null),glsl_graph$core$handle_graph_$_iter__7869.call(null,cljs.core.rest.call(null,s__7870__$2)));
+var i = cljs.core.first.call(null,s__7890__$2);
+return cljs.core.cons.call(null,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.get.call(null,links,i),cljs.core.get.call(null,links,(i + (1)))], null),glsl_graph$core$handle_graph_$_iter__7889.call(null,cljs.core.rest.call(null,s__7890__$2)));
 }
 } else {
 return null;
@@ -2425,26 +2479,26 @@ break;
 return iter__5731__auto__.call(null,cljs.core.range.call(null,(0),cljs.core.count.call(null,links),records_per_edge));
 })();
 var nodes = cljs.core.sort.call(null,clojure.set.union.call(null,cljs.core.set.call(null,(function (){var iter__5731__auto__ = ((function (graph_data__$1,records_per_edge,links,edges){
-return (function glsl_graph$core$handle_graph_$_iter__7873(s__7874){
+return (function glsl_graph$core$handle_graph_$_iter__7893(s__7894){
 return (new cljs.core.LazySeq(null,((function (graph_data__$1,records_per_edge,links,edges){
 return (function (){
-var s__7874__$1 = s__7874;
+var s__7894__$1 = s__7894;
 while(true){
-var temp__4425__auto__ = cljs.core.seq.call(null,s__7874__$1);
+var temp__4425__auto__ = cljs.core.seq.call(null,s__7894__$1);
 if(temp__4425__auto__){
-var s__7874__$2 = temp__4425__auto__;
-if(cljs.core.chunked_seq_QMARK_.call(null,s__7874__$2)){
-var c__5729__auto__ = cljs.core.chunk_first.call(null,s__7874__$2);
+var s__7894__$2 = temp__4425__auto__;
+if(cljs.core.chunked_seq_QMARK_.call(null,s__7894__$2)){
+var c__5729__auto__ = cljs.core.chunk_first.call(null,s__7894__$2);
 var size__5730__auto__ = cljs.core.count.call(null,c__5729__auto__);
-var b__7876 = cljs.core.chunk_buffer.call(null,size__5730__auto__);
-if((function (){var i__7875 = (0);
+var b__7896 = cljs.core.chunk_buffer.call(null,size__5730__auto__);
+if((function (){var i__7895 = (0);
 while(true){
-if((i__7875 < size__5730__auto__)){
-var edge = cljs.core._nth.call(null,c__5729__auto__,i__7875);
-cljs.core.chunk_append.call(null,b__7876,cljs.core.get.call(null,edge,(0)));
+if((i__7895 < size__5730__auto__)){
+var edge = cljs.core._nth.call(null,c__5729__auto__,i__7895);
+cljs.core.chunk_append.call(null,b__7896,cljs.core.get.call(null,edge,(0)));
 
-var G__7906 = (i__7875 + (1));
-i__7875 = G__7906;
+var G__7926 = (i__7895 + (1));
+i__7895 = G__7926;
 continue;
 } else {
 return true;
@@ -2452,13 +2506,13 @@ return true;
 break;
 }
 })()){
-return cljs.core.chunk_cons.call(null,cljs.core.chunk.call(null,b__7876),glsl_graph$core$handle_graph_$_iter__7873.call(null,cljs.core.chunk_rest.call(null,s__7874__$2)));
+return cljs.core.chunk_cons.call(null,cljs.core.chunk.call(null,b__7896),glsl_graph$core$handle_graph_$_iter__7893.call(null,cljs.core.chunk_rest.call(null,s__7894__$2)));
 } else {
-return cljs.core.chunk_cons.call(null,cljs.core.chunk.call(null,b__7876),null);
+return cljs.core.chunk_cons.call(null,cljs.core.chunk.call(null,b__7896),null);
 }
 } else {
-var edge = cljs.core.first.call(null,s__7874__$2);
-return cljs.core.cons.call(null,cljs.core.get.call(null,edge,(0)),glsl_graph$core$handle_graph_$_iter__7873.call(null,cljs.core.rest.call(null,s__7874__$2)));
+var edge = cljs.core.first.call(null,s__7894__$2);
+return cljs.core.cons.call(null,cljs.core.get.call(null,edge,(0)),glsl_graph$core$handle_graph_$_iter__7893.call(null,cljs.core.rest.call(null,s__7894__$2)));
 }
 } else {
 return null;
@@ -2471,26 +2525,26 @@ break;
 ;
 return iter__5731__auto__.call(null,edges);
 })()),cljs.core.set.call(null,(function (){var iter__5731__auto__ = ((function (graph_data__$1,records_per_edge,links,edges){
-return (function glsl_graph$core$handle_graph_$_iter__7877(s__7878){
+return (function glsl_graph$core$handle_graph_$_iter__7897(s__7898){
 return (new cljs.core.LazySeq(null,((function (graph_data__$1,records_per_edge,links,edges){
 return (function (){
-var s__7878__$1 = s__7878;
+var s__7898__$1 = s__7898;
 while(true){
-var temp__4425__auto__ = cljs.core.seq.call(null,s__7878__$1);
+var temp__4425__auto__ = cljs.core.seq.call(null,s__7898__$1);
 if(temp__4425__auto__){
-var s__7878__$2 = temp__4425__auto__;
-if(cljs.core.chunked_seq_QMARK_.call(null,s__7878__$2)){
-var c__5729__auto__ = cljs.core.chunk_first.call(null,s__7878__$2);
+var s__7898__$2 = temp__4425__auto__;
+if(cljs.core.chunked_seq_QMARK_.call(null,s__7898__$2)){
+var c__5729__auto__ = cljs.core.chunk_first.call(null,s__7898__$2);
 var size__5730__auto__ = cljs.core.count.call(null,c__5729__auto__);
-var b__7880 = cljs.core.chunk_buffer.call(null,size__5730__auto__);
-if((function (){var i__7879 = (0);
+var b__7900 = cljs.core.chunk_buffer.call(null,size__5730__auto__);
+if((function (){var i__7899 = (0);
 while(true){
-if((i__7879 < size__5730__auto__)){
-var edge = cljs.core._nth.call(null,c__5729__auto__,i__7879);
-cljs.core.chunk_append.call(null,b__7880,cljs.core.get.call(null,edge,(1)));
+if((i__7899 < size__5730__auto__)){
+var edge = cljs.core._nth.call(null,c__5729__auto__,i__7899);
+cljs.core.chunk_append.call(null,b__7900,cljs.core.get.call(null,edge,(1)));
 
-var G__7907 = (i__7879 + (1));
-i__7879 = G__7907;
+var G__7927 = (i__7899 + (1));
+i__7899 = G__7927;
 continue;
 } else {
 return true;
@@ -2498,13 +2552,13 @@ return true;
 break;
 }
 })()){
-return cljs.core.chunk_cons.call(null,cljs.core.chunk.call(null,b__7880),glsl_graph$core$handle_graph_$_iter__7877.call(null,cljs.core.chunk_rest.call(null,s__7878__$2)));
+return cljs.core.chunk_cons.call(null,cljs.core.chunk.call(null,b__7900),glsl_graph$core$handle_graph_$_iter__7897.call(null,cljs.core.chunk_rest.call(null,s__7898__$2)));
 } else {
-return cljs.core.chunk_cons.call(null,cljs.core.chunk.call(null,b__7880),null);
+return cljs.core.chunk_cons.call(null,cljs.core.chunk.call(null,b__7900),null);
 }
 } else {
-var edge = cljs.core.first.call(null,s__7878__$2);
-return cljs.core.cons.call(null,cljs.core.get.call(null,edge,(1)),glsl_graph$core$handle_graph_$_iter__7877.call(null,cljs.core.rest.call(null,s__7878__$2)));
+var edge = cljs.core.first.call(null,s__7898__$2);
+return cljs.core.cons.call(null,cljs.core.get.call(null,edge,(1)),glsl_graph$core$handle_graph_$_iter__7897.call(null,cljs.core.rest.call(null,s__7898__$2)));
 }
 } else {
 return null;
@@ -2518,18 +2572,18 @@ break;
 return iter__5731__auto__.call(null,edges);
 })())));
 var nodes_indexed = cljs.core.reduce.call(null,((function (graph_data__$1,records_per_edge,links,edges,nodes){
-return (function (m,p__7881){
-var vec__7882 = p__7881;
-var i2 = cljs.core.nth.call(null,vec__7882,(0),null);
-var n2 = cljs.core.nth.call(null,vec__7882,(1),null);
+return (function (m,p__7901){
+var vec__7902 = p__7901;
+var i2 = cljs.core.nth.call(null,vec__7902,(0),null);
+var n2 = cljs.core.nth.call(null,vec__7902,(1),null);
 return cljs.core.assoc.call(null,m,i2,n2);
 });})(graph_data__$1,records_per_edge,links,edges,nodes))
 ,cljs.core.PersistentArrayMap.EMPTY,cljs.core.map_indexed.call(null,cljs.core.vector,nodes));
 var nodes_reverse = cljs.core.reduce.call(null,((function (graph_data__$1,records_per_edge,links,edges,nodes,nodes_indexed){
-return (function (m,p__7883){
-var vec__7884 = p__7883;
-var i2 = cljs.core.nth.call(null,vec__7884,(0),null);
-var n2 = cljs.core.nth.call(null,vec__7884,(1),null);
+return (function (m,p__7903){
+var vec__7904 = p__7903;
+var i2 = cljs.core.nth.call(null,vec__7904,(0),null);
+var n2 = cljs.core.nth.call(null,vec__7904,(1),null);
 return cljs.core.assoc.call(null,m,n2,i2);
 });})(graph_data__$1,records_per_edge,links,edges,nodes,nodes_indexed))
 ,cljs.core.PersistentArrayMap.EMPTY,cljs.core.map_indexed.call(null,cljs.core.vector,nodes));
@@ -2547,32 +2601,32 @@ return cljs.core.PersistentVector.EMPTY;
 var node_neighbours__$1 = cljs.core.reduce.call(null,((function (graph_data__$1,records_per_edge,links,edges,nodes,nodes_indexed,nodes_reverse,edges_indexed,node_count,node_neighbours){
 return (function (m,edge){
 return cljs.core.update_in.call(null,cljs.core.update_in.call(null,m,new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.get.call(null,edge,(0))], null),((function (graph_data__$1,records_per_edge,links,edges,nodes,nodes_indexed,nodes_reverse,edges_indexed,node_count,node_neighbours){
-return (function (p1__7826_SHARP_){
-return cljs.core.conj.call(null,p1__7826_SHARP_,cljs.core.get.call(null,edge,(1)));
+return (function (p1__7846_SHARP_){
+return cljs.core.conj.call(null,p1__7846_SHARP_,cljs.core.get.call(null,edge,(1)));
 });})(graph_data__$1,records_per_edge,links,edges,nodes,nodes_indexed,nodes_reverse,edges_indexed,node_count,node_neighbours))
 ),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.get.call(null,edge,(1))], null),((function (graph_data__$1,records_per_edge,links,edges,nodes,nodes_indexed,nodes_reverse,edges_indexed,node_count,node_neighbours){
-return (function (p1__7827_SHARP_){
-return cljs.core.conj.call(null,p1__7827_SHARP_,cljs.core.get.call(null,edge,(0)));
+return (function (p1__7847_SHARP_){
+return cljs.core.conj.call(null,p1__7847_SHARP_,cljs.core.get.call(null,edge,(0)));
 });})(graph_data__$1,records_per_edge,links,edges,nodes,nodes_indexed,nodes_reverse,edges_indexed,node_count,node_neighbours))
 );
 });})(graph_data__$1,records_per_edge,links,edges,nodes,nodes_indexed,nodes_reverse,edges_indexed,node_count,node_neighbours))
 ,node_neighbours,edges_indexed);
 var degrees = cljs.core.map.call(null,((function (graph_data__$1,records_per_edge,links,edges,nodes,nodes_indexed,nodes_reverse,edges_indexed,node_count,node_neighbours,node_neighbours__$1){
-return (function (p1__7828_SHARP_){
-return cljs.core.count.call(null,p1__7828_SHARP_);
+return (function (p1__7848_SHARP_){
+return cljs.core.count.call(null,p1__7848_SHARP_);
 });})(graph_data__$1,records_per_edge,links,edges,nodes,nodes_indexed,nodes_reverse,edges_indexed,node_count,node_neighbours,node_neighbours__$1))
 ,node_neighbours__$1);
 var max_degree = cljs.core.apply.call(null,cljs.core.max,degrees);
-var vec__7867 = cljs.core.reduce.call(null,((function (graph_data__$1,records_per_edge,links,edges,nodes,nodes_indexed,nodes_reverse,edges_indexed,node_count,node_neighbours,node_neighbours__$1,degrees,max_degree){
-return (function (p__7885,neighbour_list){
-var vec__7886 = p__7885;
-var v = cljs.core.nth.call(null,vec__7886,(0),null);
-var total = cljs.core.nth.call(null,vec__7886,(1),null);
+var vec__7887 = cljs.core.reduce.call(null,((function (graph_data__$1,records_per_edge,links,edges,nodes,nodes_indexed,nodes_reverse,edges_indexed,node_count,node_neighbours,node_neighbours__$1,degrees,max_degree){
+return (function (p__7905,neighbour_list){
+var vec__7906 = p__7905;
+var v = cljs.core.nth.call(null,vec__7906,(0),null);
+var total = cljs.core.nth.call(null,vec__7906,(1),null);
 return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.conj.call(null,v,total),(total + cljs.core.count.call(null,neighbour_list))], null);
 });})(graph_data__$1,records_per_edge,links,edges,nodes,nodes_indexed,nodes_reverse,edges_indexed,node_count,node_neighbours,node_neighbours__$1,degrees,max_degree))
 ,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.PersistentVector.EMPTY,(0)], null),node_neighbours__$1);
-var node_neighbours_startpos = cljs.core.nth.call(null,vec__7867,(0),null);
-var total = cljs.core.nth.call(null,vec__7867,(1),null);
+var node_neighbours_startpos = cljs.core.nth.call(null,vec__7887,(0),null);
+var total = cljs.core.nth.call(null,vec__7887,(1),null);
 var node_neighbours_startpos__$1 = cljs.core.conj.call(null,node_neighbours_startpos,total);
 var node_neighbours_flat = cljs.core.vec.call(null,cljs.core.flatten.call(null,node_neighbours__$1));
 var directed_edge_count = cljs.core.count.call(null,edges_indexed);
@@ -2594,7 +2648,7 @@ var ___$1 = ((cljs.core._EQ_.call(null,gl.getExtension("OES_texture_float"),null
 var ___$2 = ((cljs.core._EQ_.call(null,gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS),(0)))?glsl_graph.core.sweet_alert.call(null,"No support for vertex shader textures!","error"):null);
 var scene = (new glsl_graph.core.THREE.Scene());
 var defines = cljs.core.clj__GT_js.call(null,new cljs.core.PersistentArrayMap(null, 5, [new cljs.core.Keyword(null,"NODECOUNT","NODECOUNT",-1898680938),node_count,new cljs.core.Keyword(null,"EDGECOUNT","EDGECOUNT",-1162164398),edge_count,new cljs.core.Keyword(null,"SQNODE","SQNODE",538243516),node_sq,new cljs.core.Keyword(null,"SQEDGE","SQEDGE",334841862),edge_sq,new cljs.core.Keyword(null,"USE3D","USE3D",175342307),"false"], null));
-var uniforms = cljs.core.clj__GT_js.call(null,cljs.core.PersistentHashMap.fromArrays([new cljs.core.Keyword(null,"u_node_count","u_node_count",-1496825084),new cljs.core.Keyword(null,"u_iteration","u_iteration",-583933530),new cljs.core.Keyword(null,"u_time","u_time",-213869942),new cljs.core.Keyword(null,"u_spring_length","u_spring_length",-313357426),new cljs.core.Keyword(null,"u_speed_reduction","u_speed_reduction",1822466450),new cljs.core.Keyword(null,"u_texture_velocities","u_texture_velocities",-1835025966),new cljs.core.Keyword(null,"u_min_dist","u_min_dist",1457804468),new cljs.core.Keyword(null,"u_texture_edges","u_texture_edges",1662045304),new cljs.core.Keyword(null,"u_dist_reduction","u_dist_reduction",-733443368),new cljs.core.Keyword(null,"u_time_old","u_time_old",-918776104),new cljs.core.Keyword(null,"u_time_delta","u_time_delta",646896155),new cljs.core.Keyword(null,"u_resolution","u_resolution",-2041817604),new cljs.core.Keyword(null,"u_texture_positions","u_texture_positions",-1800934564),new cljs.core.Keyword(null,"u_spring_coefficient","u_spring_coefficient",-1685897348)],[new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),node_count], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),(0)], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),((new Date()).getTime() / 1000.0)], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),30.0], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),1000.0], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"t",new cljs.core.Keyword(null,"value","value",305978217),null], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),1.0], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"t",new cljs.core.Keyword(null,"value","value",305978217),null], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),(30.0 / 1000.0)], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),0.0], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),0.0], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"v2",new cljs.core.Keyword(null,"value","value",305978217),(new glsl_graph.core.THREE.Vector2(tw,th))], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"t",new cljs.core.Keyword(null,"value","value",305978217),null], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),0.1], null)]));
+var uniforms = cljs.core.clj__GT_js.call(null,cljs.core.PersistentHashMap.fromArrays([new cljs.core.Keyword(null,"u_node_count","u_node_count",-1496825084),new cljs.core.Keyword(null,"u_iteration","u_iteration",-583933530),new cljs.core.Keyword(null,"u_time","u_time",-213869942),new cljs.core.Keyword(null,"u_spring_length","u_spring_length",-313357426),new cljs.core.Keyword(null,"u_speed_reduction","u_speed_reduction",1822466450),new cljs.core.Keyword(null,"u_texture_velocities","u_texture_velocities",-1835025966),new cljs.core.Keyword(null,"u_min_dist","u_min_dist",1457804468),new cljs.core.Keyword(null,"u_texture_edges","u_texture_edges",1662045304),new cljs.core.Keyword(null,"u_dist_reduction","u_dist_reduction",-733443368),new cljs.core.Keyword(null,"u_time_old","u_time_old",-918776104),new cljs.core.Keyword(null,"u_time_delta","u_time_delta",646896155),new cljs.core.Keyword(null,"u_resolution","u_resolution",-2041817604),new cljs.core.Keyword(null,"u_texture_positions","u_texture_positions",-1800934564),new cljs.core.Keyword(null,"u_spring_coefficient","u_spring_coefficient",-1685897348)],[new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),node_count], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),(0)], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),((new Date()).getTime() / 1000.0)], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),3.0], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),1000.0], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"t",new cljs.core.Keyword(null,"value","value",305978217),null], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),1.0], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"t",new cljs.core.Keyword(null,"value","value",305978217),null], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),(30.0 / 1000000.0)], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),0.0], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),0.0], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"v2",new cljs.core.Keyword(null,"value","value",305978217),(new glsl_graph.core.THREE.Vector2(tw,th))], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"t",new cljs.core.Keyword(null,"value","value",305978217),null], null),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"f",new cljs.core.Keyword(null,"value","value",305978217),100.0], null)]));
 var uniforms_pass_through = cljs.core.clj__GT_js.call(null,new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"u_pass_texture","u_pass_texture",-521325692),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"t",new cljs.core.Keyword(null,"value","value",305978217),null], null),new cljs.core.Keyword(null,"u_resolution","u_resolution",-2041817604),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"v2",new cljs.core.Keyword(null,"value","value",305978217),(new glsl_graph.core.three.Vector2(out_width,out_height))], null)], null));
 var pass_through_vs = jayq.core.$.call(null,"#pass-through-vs").text();
 var pass_through_fs = jayq.core.$.call(null,"#pass-through-fs").text();
@@ -2608,7 +2662,7 @@ var mesh = (new glsl_graph.core.THREE.Mesh(plane,pass_through_material));
 var ___$3 = scene.add(mesh);
 var screen_scene = (new glsl_graph.core.THREE.Scene());
 var screen_camera = (new glsl_graph.core.THREE.PerspectiveCamera((75),(window.innerWidth / window.innerHeight),0.1,(1000)));
-var ___$4 = screen_camera.position.y = (1);
+var ___$4 = screen_camera.position.z = 0.2;
 var controls = (new OrbitControls(screen_camera));
 var screen_geometry = (new glsl_graph.core.THREE.Geometry());
 var screen_uniforms = cljs.core.clj__GT_js.call(null,new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"u_texture_positions","u_texture_positions",-1800934564),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"t",new cljs.core.Keyword(null,"value","value",305978217),null], null),new cljs.core.Keyword(null,"u_resolution","u_resolution",-2041817604),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"type","type",1174270348),"v2",new cljs.core.Keyword(null,"value","value",305978217),(new glsl_graph.core.THREE.Vector2(window.innerWidth,window.innerHeight))], null)], null));
@@ -2620,82 +2674,82 @@ var screen_geometry__$1 = (new glsl_graph.core.THREE.BufferGeometry());
 var ___$5 = screen_geometry__$1.addAttribute("position",(new glsl_graph.core.THREE.BufferAttribute((new Float32Array((node_count * (3)))),(3))));
 var ___$6 = screen_geometry__$1.addAttribute("a_color",(new glsl_graph.core.THREE.BufferAttribute((new Float32Array((node_count * (3)))),(3))));
 var ___$7 = screen_geometry__$1.addAttribute("a_displacement_index",(new glsl_graph.core.THREE.BufferAttribute((new Float32Array((node_count * (2)))),(2))));
-var node_index_to_texture = ((function (graph_data__$1,records_per_edge,links,edges,nodes,nodes_indexed,nodes_reverse,edges_indexed,node_count,node_neighbours,node_neighbours__$1,degrees,max_degree,vec__7867,node_neighbours_startpos,total,node_neighbours_startpos__$1,node_neighbours_flat,directed_edge_count,edge_count,node_sq,edge_sq,tw,th,ew,eh,floats_per_planet,out_width,out_height,renderer,camera,_,gl,___$1,___$2,scene,defines,uniforms,uniforms_pass_through,pass_through_vs,pass_through_fs,pass_through_material,velocity_fs,velocity_material,position_fs,position_material,plane,mesh,___$3,screen_scene,screen_camera,___$4,controls,screen_geometry,screen_uniforms,screen_attributes,screen_vs,screen_fs,screen_material,screen_geometry__$1,___$5,___$6,___$7){
+var node_index_to_texture = ((function (graph_data__$1,records_per_edge,links,edges,nodes,nodes_indexed,nodes_reverse,edges_indexed,node_count,node_neighbours,node_neighbours__$1,degrees,max_degree,vec__7887,node_neighbours_startpos,total,node_neighbours_startpos__$1,node_neighbours_flat,directed_edge_count,edge_count,node_sq,edge_sq,tw,th,ew,eh,floats_per_planet,out_width,out_height,renderer,camera,_,gl,___$1,___$2,scene,defines,uniforms,uniforms_pass_through,pass_through_vs,pass_through_fs,pass_through_material,velocity_fs,velocity_material,position_fs,position_material,plane,mesh,___$3,screen_scene,screen_camera,___$4,controls,screen_geometry,screen_uniforms,screen_attributes,screen_vs,screen_fs,screen_material,screen_geometry__$1,___$5,___$6,___$7){
 return (function (i){
 var xf = (cljs.core.mod.call(null,i,tw) / tw);
 var y = Math.floor((i / tw));
 var yf = (y / th);
 return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [xf,yf], null);
-});})(graph_data__$1,records_per_edge,links,edges,nodes,nodes_indexed,nodes_reverse,edges_indexed,node_count,node_neighbours,node_neighbours__$1,degrees,max_degree,vec__7867,node_neighbours_startpos,total,node_neighbours_startpos__$1,node_neighbours_flat,directed_edge_count,edge_count,node_sq,edge_sq,tw,th,ew,eh,floats_per_planet,out_width,out_height,renderer,camera,_,gl,___$1,___$2,scene,defines,uniforms,uniforms_pass_through,pass_through_vs,pass_through_fs,pass_through_material,velocity_fs,velocity_material,position_fs,position_material,plane,mesh,___$3,screen_scene,screen_camera,___$4,controls,screen_geometry,screen_uniforms,screen_attributes,screen_vs,screen_fs,screen_material,screen_geometry__$1,___$5,___$6,___$7))
+});})(graph_data__$1,records_per_edge,links,edges,nodes,nodes_indexed,nodes_reverse,edges_indexed,node_count,node_neighbours,node_neighbours__$1,degrees,max_degree,vec__7887,node_neighbours_startpos,total,node_neighbours_startpos__$1,node_neighbours_flat,directed_edge_count,edge_count,node_sq,edge_sq,tw,th,ew,eh,floats_per_planet,out_width,out_height,renderer,camera,_,gl,___$1,___$2,scene,defines,uniforms,uniforms_pass_through,pass_through_vs,pass_through_fs,pass_through_material,velocity_fs,velocity_material,position_fs,position_material,plane,mesh,___$3,screen_scene,screen_camera,___$4,controls,screen_geometry,screen_uniforms,screen_attributes,screen_vs,screen_fs,screen_material,screen_geometry__$1,___$5,___$6,___$7))
 ;
 var vertices = screen_geometry__$1.getAttribute("position");
 var a_displacement_index = screen_geometry__$1.getAttribute("a_displacement_index");
 var a_color = screen_geometry__$1.getAttribute("a_color");
-var ___$8 = (function (){var seq__7887 = cljs.core.seq.call(null,cljs.core.range.call(null,(0),node_count));
-var chunk__7888 = null;
-var count__7889 = (0);
-var i__7890 = (0);
+var ___$8 = (function (){var seq__7907 = cljs.core.seq.call(null,cljs.core.range.call(null,(0),node_count));
+var chunk__7908 = null;
+var count__7909 = (0);
+var i__7910 = (0);
 while(true){
-if((i__7890 < count__7889)){
-var i = cljs.core._nth.call(null,chunk__7888,i__7890);
-var vec__7891_7908 = node_index_to_texture.call(null,i);
-var xf_7909 = cljs.core.nth.call(null,vec__7891_7908,(0),null);
-var yf_7910 = cljs.core.nth.call(null,vec__7891_7908,(1),null);
-var r_7911 = Math.random();
-var g_7912 = Math.random();
-var b_7913 = Math.random();
+if((i__7910 < count__7909)){
+var i = cljs.core._nth.call(null,chunk__7908,i__7910);
+var vec__7911_7928 = node_index_to_texture.call(null,i);
+var xf_7929 = cljs.core.nth.call(null,vec__7911_7928,(0),null);
+var yf_7930 = cljs.core.nth.call(null,vec__7911_7928,(1),null);
+var r_7931 = Math.random();
+var g_7932 = Math.random();
+var b_7933 = Math.random();
 vertices.setXYZ(i,(0),(0),(0));
 
-a_displacement_index.setXY(i,xf_7909,yf_7910);
+a_displacement_index.setXY(i,xf_7929,yf_7930);
 
-a_color.setXYZ(i,r_7911,g_7912,b_7913);
+a_color.setXYZ(i,r_7931,g_7932,b_7933);
 
-var G__7914 = seq__7887;
-var G__7915 = chunk__7888;
-var G__7916 = count__7889;
-var G__7917 = (i__7890 + (1));
-seq__7887 = G__7914;
-chunk__7888 = G__7915;
-count__7889 = G__7916;
-i__7890 = G__7917;
+var G__7934 = seq__7907;
+var G__7935 = chunk__7908;
+var G__7936 = count__7909;
+var G__7937 = (i__7910 + (1));
+seq__7907 = G__7934;
+chunk__7908 = G__7935;
+count__7909 = G__7936;
+i__7910 = G__7937;
 continue;
 } else {
-var temp__4425__auto__ = cljs.core.seq.call(null,seq__7887);
+var temp__4425__auto__ = cljs.core.seq.call(null,seq__7907);
 if(temp__4425__auto__){
-var seq__7887__$1 = temp__4425__auto__;
-if(cljs.core.chunked_seq_QMARK_.call(null,seq__7887__$1)){
-var c__5762__auto__ = cljs.core.chunk_first.call(null,seq__7887__$1);
-var G__7918 = cljs.core.chunk_rest.call(null,seq__7887__$1);
-var G__7919 = c__5762__auto__;
-var G__7920 = cljs.core.count.call(null,c__5762__auto__);
-var G__7921 = (0);
-seq__7887 = G__7918;
-chunk__7888 = G__7919;
-count__7889 = G__7920;
-i__7890 = G__7921;
+var seq__7907__$1 = temp__4425__auto__;
+if(cljs.core.chunked_seq_QMARK_.call(null,seq__7907__$1)){
+var c__5762__auto__ = cljs.core.chunk_first.call(null,seq__7907__$1);
+var G__7938 = cljs.core.chunk_rest.call(null,seq__7907__$1);
+var G__7939 = c__5762__auto__;
+var G__7940 = cljs.core.count.call(null,c__5762__auto__);
+var G__7941 = (0);
+seq__7907 = G__7938;
+chunk__7908 = G__7939;
+count__7909 = G__7940;
+i__7910 = G__7941;
 continue;
 } else {
-var i = cljs.core.first.call(null,seq__7887__$1);
-var vec__7892_7922 = node_index_to_texture.call(null,i);
-var xf_7923 = cljs.core.nth.call(null,vec__7892_7922,(0),null);
-var yf_7924 = cljs.core.nth.call(null,vec__7892_7922,(1),null);
-var r_7925 = Math.random();
-var g_7926 = Math.random();
-var b_7927 = Math.random();
+var i = cljs.core.first.call(null,seq__7907__$1);
+var vec__7912_7942 = node_index_to_texture.call(null,i);
+var xf_7943 = cljs.core.nth.call(null,vec__7912_7942,(0),null);
+var yf_7944 = cljs.core.nth.call(null,vec__7912_7942,(1),null);
+var r_7945 = Math.random();
+var g_7946 = Math.random();
+var b_7947 = Math.random();
 vertices.setXYZ(i,(0),(0),(0));
 
-a_displacement_index.setXY(i,xf_7923,yf_7924);
+a_displacement_index.setXY(i,xf_7943,yf_7944);
 
-a_color.setXYZ(i,r_7925,g_7926,b_7927);
+a_color.setXYZ(i,r_7945,g_7946,b_7947);
 
-var G__7928 = cljs.core.next.call(null,seq__7887__$1);
-var G__7929 = null;
-var G__7930 = (0);
-var G__7931 = (0);
-seq__7887 = G__7928;
-chunk__7888 = G__7929;
-count__7889 = G__7930;
-i__7890 = G__7931;
+var G__7948 = cljs.core.next.call(null,seq__7907__$1);
+var G__7949 = null;
+var G__7950 = (0);
+var G__7951 = (0);
+seq__7907 = G__7948;
+chunk__7908 = G__7949;
+count__7909 = G__7950;
+i__7910 = G__7951;
 continue;
 }
 } else {
@@ -2717,95 +2771,95 @@ var lines_material = (new glsl_graph.core.THREE.ShaderMaterial(cljs.core.clj__GT
 var position = lines_geometry.getAttribute("position");
 var ___$13 = lines_geometry.computeBoundingSphere();
 var a_displacement_index__$1 = lines_geometry.getAttribute("a_displacement_index");
-var ___$14 = (function (){var seq__7893 = cljs.core.seq.call(null,cljs.core.map_indexed.call(null,cljs.core.vector,edges_indexed));
-var chunk__7894 = null;
-var count__7895 = (0);
-var i__7896 = (0);
+var ___$14 = (function (){var seq__7913 = cljs.core.seq.call(null,cljs.core.map_indexed.call(null,cljs.core.vector,edges_indexed));
+var chunk__7914 = null;
+var count__7915 = (0);
+var i__7916 = (0);
 while(true){
-if((i__7896 < count__7895)){
-var vec__7897 = cljs.core._nth.call(null,chunk__7894,i__7896);
-var i = cljs.core.nth.call(null,vec__7897,(0),null);
-var vec__7898 = cljs.core.nth.call(null,vec__7897,(1),null);
-var n1 = cljs.core.nth.call(null,vec__7898,(0),null);
-var n2 = cljs.core.nth.call(null,vec__7898,(1),null);
-var j_7932 = (i * (3));
-var vec__7899_7933 = node_index_to_texture.call(null,n1);
-var xf1_7934 = cljs.core.nth.call(null,vec__7899_7933,(0),null);
-var yf1_7935 = cljs.core.nth.call(null,vec__7899_7933,(1),null);
-var vec__7900_7936 = node_index_to_texture.call(null,n2);
-var xf2_7937 = cljs.core.nth.call(null,vec__7900_7936,(0),null);
-var yf2_7938 = cljs.core.nth.call(null,vec__7900_7936,(1),null);
-var inf_7939 = Number.POSITIVE_INFINITY;
-position.setXYZ((j_7932 + (0)),(0),(0),(0));
+if((i__7916 < count__7915)){
+var vec__7917 = cljs.core._nth.call(null,chunk__7914,i__7916);
+var i = cljs.core.nth.call(null,vec__7917,(0),null);
+var vec__7918 = cljs.core.nth.call(null,vec__7917,(1),null);
+var n1 = cljs.core.nth.call(null,vec__7918,(0),null);
+var n2 = cljs.core.nth.call(null,vec__7918,(1),null);
+var j_7952 = (i * (3));
+var vec__7919_7953 = node_index_to_texture.call(null,n1);
+var xf1_7954 = cljs.core.nth.call(null,vec__7919_7953,(0),null);
+var yf1_7955 = cljs.core.nth.call(null,vec__7919_7953,(1),null);
+var vec__7920_7956 = node_index_to_texture.call(null,n2);
+var xf2_7957 = cljs.core.nth.call(null,vec__7920_7956,(0),null);
+var yf2_7958 = cljs.core.nth.call(null,vec__7920_7956,(1),null);
+var inf_7959 = Number.POSITIVE_INFINITY;
+position.setXYZ((j_7952 + (0)),(0),(0),(0));
 
-position.setXYZ((j_7932 + (1)),(0),(0),(0));
+position.setXYZ((j_7952 + (1)),(0),(0),(0));
 
-position.setXYZ((j_7932 + (2)),inf_7939,inf_7939,inf_7939);
+position.setXYZ((j_7952 + (2)),inf_7959,inf_7959,inf_7959);
 
-a_displacement_index__$1.setXY((j_7932 + (0)),xf1_7934,yf1_7935);
+a_displacement_index__$1.setXY((j_7952 + (0)),xf1_7954,yf1_7955);
 
-a_displacement_index__$1.setXY((j_7932 + (1)),xf2_7937,yf2_7938);
+a_displacement_index__$1.setXY((j_7952 + (1)),xf2_7957,yf2_7958);
 
-a_displacement_index__$1.setXY((j_7932 + (2)),xf2_7937,yf2_7938);
+a_displacement_index__$1.setXY((j_7952 + (2)),xf2_7957,yf2_7958);
 
-var G__7940 = seq__7893;
-var G__7941 = chunk__7894;
-var G__7942 = count__7895;
-var G__7943 = (i__7896 + (1));
-seq__7893 = G__7940;
-chunk__7894 = G__7941;
-count__7895 = G__7942;
-i__7896 = G__7943;
+var G__7960 = seq__7913;
+var G__7961 = chunk__7914;
+var G__7962 = count__7915;
+var G__7963 = (i__7916 + (1));
+seq__7913 = G__7960;
+chunk__7914 = G__7961;
+count__7915 = G__7962;
+i__7916 = G__7963;
 continue;
 } else {
-var temp__4425__auto__ = cljs.core.seq.call(null,seq__7893);
+var temp__4425__auto__ = cljs.core.seq.call(null,seq__7913);
 if(temp__4425__auto__){
-var seq__7893__$1 = temp__4425__auto__;
-if(cljs.core.chunked_seq_QMARK_.call(null,seq__7893__$1)){
-var c__5762__auto__ = cljs.core.chunk_first.call(null,seq__7893__$1);
-var G__7944 = cljs.core.chunk_rest.call(null,seq__7893__$1);
-var G__7945 = c__5762__auto__;
-var G__7946 = cljs.core.count.call(null,c__5762__auto__);
-var G__7947 = (0);
-seq__7893 = G__7944;
-chunk__7894 = G__7945;
-count__7895 = G__7946;
-i__7896 = G__7947;
+var seq__7913__$1 = temp__4425__auto__;
+if(cljs.core.chunked_seq_QMARK_.call(null,seq__7913__$1)){
+var c__5762__auto__ = cljs.core.chunk_first.call(null,seq__7913__$1);
+var G__7964 = cljs.core.chunk_rest.call(null,seq__7913__$1);
+var G__7965 = c__5762__auto__;
+var G__7966 = cljs.core.count.call(null,c__5762__auto__);
+var G__7967 = (0);
+seq__7913 = G__7964;
+chunk__7914 = G__7965;
+count__7915 = G__7966;
+i__7916 = G__7967;
 continue;
 } else {
-var vec__7901 = cljs.core.first.call(null,seq__7893__$1);
-var i = cljs.core.nth.call(null,vec__7901,(0),null);
-var vec__7902 = cljs.core.nth.call(null,vec__7901,(1),null);
-var n1 = cljs.core.nth.call(null,vec__7902,(0),null);
-var n2 = cljs.core.nth.call(null,vec__7902,(1),null);
-var j_7948 = (i * (3));
-var vec__7903_7949 = node_index_to_texture.call(null,n1);
-var xf1_7950 = cljs.core.nth.call(null,vec__7903_7949,(0),null);
-var yf1_7951 = cljs.core.nth.call(null,vec__7903_7949,(1),null);
-var vec__7904_7952 = node_index_to_texture.call(null,n2);
-var xf2_7953 = cljs.core.nth.call(null,vec__7904_7952,(0),null);
-var yf2_7954 = cljs.core.nth.call(null,vec__7904_7952,(1),null);
-var inf_7955 = Number.POSITIVE_INFINITY;
-position.setXYZ((j_7948 + (0)),(0),(0),(0));
+var vec__7921 = cljs.core.first.call(null,seq__7913__$1);
+var i = cljs.core.nth.call(null,vec__7921,(0),null);
+var vec__7922 = cljs.core.nth.call(null,vec__7921,(1),null);
+var n1 = cljs.core.nth.call(null,vec__7922,(0),null);
+var n2 = cljs.core.nth.call(null,vec__7922,(1),null);
+var j_7968 = (i * (3));
+var vec__7923_7969 = node_index_to_texture.call(null,n1);
+var xf1_7970 = cljs.core.nth.call(null,vec__7923_7969,(0),null);
+var yf1_7971 = cljs.core.nth.call(null,vec__7923_7969,(1),null);
+var vec__7924_7972 = node_index_to_texture.call(null,n2);
+var xf2_7973 = cljs.core.nth.call(null,vec__7924_7972,(0),null);
+var yf2_7974 = cljs.core.nth.call(null,vec__7924_7972,(1),null);
+var inf_7975 = Number.POSITIVE_INFINITY;
+position.setXYZ((j_7968 + (0)),(0),(0),(0));
 
-position.setXYZ((j_7948 + (1)),(0),(0),(0));
+position.setXYZ((j_7968 + (1)),(0),(0),(0));
 
-position.setXYZ((j_7948 + (2)),inf_7955,inf_7955,inf_7955);
+position.setXYZ((j_7968 + (2)),inf_7975,inf_7975,inf_7975);
 
-a_displacement_index__$1.setXY((j_7948 + (0)),xf1_7950,yf1_7951);
+a_displacement_index__$1.setXY((j_7968 + (0)),xf1_7970,yf1_7971);
 
-a_displacement_index__$1.setXY((j_7948 + (1)),xf2_7953,yf2_7954);
+a_displacement_index__$1.setXY((j_7968 + (1)),xf2_7973,yf2_7974);
 
-a_displacement_index__$1.setXY((j_7948 + (2)),xf2_7953,yf2_7954);
+a_displacement_index__$1.setXY((j_7968 + (2)),xf2_7973,yf2_7974);
 
-var G__7956 = cljs.core.next.call(null,seq__7893__$1);
-var G__7957 = null;
-var G__7958 = (0);
-var G__7959 = (0);
-seq__7893 = G__7956;
-chunk__7894 = G__7957;
-count__7895 = G__7958;
-i__7896 = G__7959;
+var G__7976 = cljs.core.next.call(null,seq__7913__$1);
+var G__7977 = null;
+var G__7978 = (0);
+var G__7979 = (0);
+seq__7913 = G__7976;
+chunk__7914 = G__7977;
+count__7915 = G__7978;
+i__7916 = G__7979;
 continue;
 }
 } else {
@@ -2822,10 +2876,10 @@ var rt_positions1 = rt.clone();
 var rt_positions2 = rt.clone();
 var rt_velocities1 = rt.clone();
 var rt_velocities2 = rt.clone();
-var vec__7868 = glsl_graph.core.gen_texture.call(null,node_count,edge_count,tw,th,ew,eh,node_neighbours_startpos__$1,node_neighbours_flat);
-var t_positions = cljs.core.nth.call(null,vec__7868,(0),null);
-var t_velocities = cljs.core.nth.call(null,vec__7868,(1),null);
-var t_edges = cljs.core.nth.call(null,vec__7868,(2),null);
+var vec__7888 = glsl_graph.core.gen_texture.call(null,node_count,edge_count,tw,th,ew,eh,node_neighbours_startpos__$1,node_neighbours_flat);
+var t_positions = cljs.core.nth.call(null,vec__7888,(0),null);
+var t_velocities = cljs.core.nth.call(null,vec__7888,(1),null);
+var t_edges = cljs.core.nth.call(null,vec__7888,(2),null);
 var ___$16 = (uniforms_pass_through["u_pass_texture"]["value"] = t_positions);
 var ___$17 = (mesh["material"] = pass_through_material);
 var ___$18 = renderer.render(scene,camera,rt_positions1,true);
@@ -2878,11 +2932,11 @@ var this__5573__auto____$1 = this;
 return cljs.core._lookup.call(null,this__5573__auto____$1,k__5574__auto__,null);
 });
 
-glsl_graph.core.get_graph_Record.prototype.cljs$core$ILookup$_lookup$arity$3 = (function (this__5575__auto__,k7962,else__5576__auto__){
+glsl_graph.core.get_graph_Record.prototype.cljs$core$ILookup$_lookup$arity$3 = (function (this__5575__auto__,k7982,else__5576__auto__){
 var self__ = this;
 var this__5575__auto____$1 = this;
-var G__7964 = (((k7962 instanceof cljs.core.Keyword))?k7962.fqn:null);
-switch (G__7964) {
+var G__7984 = (((k7982 instanceof cljs.core.Keyword))?k7982.fqn:null);
+switch (G__7984) {
 case "renderer":
 return self__.renderer;
 
@@ -2908,7 +2962,7 @@ return self__.render_options;
 
 break;
 default:
-return cljs.core.get.call(null,self__.__extmap,k7962,else__5576__auto__);
+return cljs.core.get.call(null,self__.__extmap,k7982,else__5576__auto__);
 
 }
 });
@@ -2926,10 +2980,10 @@ return cljs.core.pr_sequential_writer.call(null,writer__5588__auto__,pr_pair__55
 
 glsl_graph.core.get_graph_Record.prototype.cljs$core$IIterable$ = true;
 
-glsl_graph.core.get_graph_Record.prototype.cljs$core$IIterable$_iterator$arity$1 = (function (G__7961){
+glsl_graph.core.get_graph_Record.prototype.cljs$core$IIterable$_iterator$arity$1 = (function (G__7981){
 var self__ = this;
-var G__7961__$1 = this;
-return (new cljs.core.RecordIter((0),G__7961__$1,6,new cljs.core.PersistentVector(null, 6, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"renderer","renderer",336841071),new cljs.core.Keyword(null,"scene","scene",1523800415),new cljs.core.Keyword(null,"camera","camera",-1190348585),new cljs.core.Keyword(null,"init-scene","init-scene",-1015924774),new cljs.core.Keyword(null,"render-options-ready","render-options-ready",-765593401),new cljs.core.Keyword(null,"render-options","render-options",686799147)], null),cljs.core._iterator.call(null,self__.__extmap)));
+var G__7981__$1 = this;
+return (new cljs.core.RecordIter((0),G__7981__$1,6,new cljs.core.PersistentVector(null, 6, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"renderer","renderer",336841071),new cljs.core.Keyword(null,"scene","scene",1523800415),new cljs.core.Keyword(null,"camera","camera",-1190348585),new cljs.core.Keyword(null,"init-scene","init-scene",-1015924774),new cljs.core.Keyword(null,"render-options-ready","render-options-ready",-765593401),new cljs.core.Keyword(null,"render-options","render-options",686799147)], null),cljs.core._iterator.call(null,self__.__extmap)));
 });
 
 glsl_graph.core.get_graph_Record.prototype.cljs$core$IMeta$_meta$arity$1 = (function (this__5571__auto__){
@@ -2995,30 +3049,30 @@ return (new glsl_graph.core.get_graph_Record(self__.renderer,self__.scene,self__
 }
 });
 
-glsl_graph.core.get_graph_Record.prototype.cljs$core$IAssociative$_assoc$arity$3 = (function (this__5580__auto__,k__5581__auto__,G__7961){
+glsl_graph.core.get_graph_Record.prototype.cljs$core$IAssociative$_assoc$arity$3 = (function (this__5580__auto__,k__5581__auto__,G__7981){
 var self__ = this;
 var this__5580__auto____$1 = this;
-var pred__7965 = cljs.core.keyword_identical_QMARK_;
-var expr__7966 = k__5581__auto__;
-if(cljs.core.truth_(pred__7965.call(null,new cljs.core.Keyword(null,"renderer","renderer",336841071),expr__7966))){
-return (new glsl_graph.core.get_graph_Record(G__7961,self__.scene,self__.camera,self__.init_scene,self__.render_options_ready,self__.render_options,self__.__meta,self__.__extmap,null));
+var pred__7985 = cljs.core.keyword_identical_QMARK_;
+var expr__7986 = k__5581__auto__;
+if(cljs.core.truth_(pred__7985.call(null,new cljs.core.Keyword(null,"renderer","renderer",336841071),expr__7986))){
+return (new glsl_graph.core.get_graph_Record(G__7981,self__.scene,self__.camera,self__.init_scene,self__.render_options_ready,self__.render_options,self__.__meta,self__.__extmap,null));
 } else {
-if(cljs.core.truth_(pred__7965.call(null,new cljs.core.Keyword(null,"scene","scene",1523800415),expr__7966))){
-return (new glsl_graph.core.get_graph_Record(self__.renderer,G__7961,self__.camera,self__.init_scene,self__.render_options_ready,self__.render_options,self__.__meta,self__.__extmap,null));
+if(cljs.core.truth_(pred__7985.call(null,new cljs.core.Keyword(null,"scene","scene",1523800415),expr__7986))){
+return (new glsl_graph.core.get_graph_Record(self__.renderer,G__7981,self__.camera,self__.init_scene,self__.render_options_ready,self__.render_options,self__.__meta,self__.__extmap,null));
 } else {
-if(cljs.core.truth_(pred__7965.call(null,new cljs.core.Keyword(null,"camera","camera",-1190348585),expr__7966))){
-return (new glsl_graph.core.get_graph_Record(self__.renderer,self__.scene,G__7961,self__.init_scene,self__.render_options_ready,self__.render_options,self__.__meta,self__.__extmap,null));
+if(cljs.core.truth_(pred__7985.call(null,new cljs.core.Keyword(null,"camera","camera",-1190348585),expr__7986))){
+return (new glsl_graph.core.get_graph_Record(self__.renderer,self__.scene,G__7981,self__.init_scene,self__.render_options_ready,self__.render_options,self__.__meta,self__.__extmap,null));
 } else {
-if(cljs.core.truth_(pred__7965.call(null,new cljs.core.Keyword(null,"init-scene","init-scene",-1015924774),expr__7966))){
-return (new glsl_graph.core.get_graph_Record(self__.renderer,self__.scene,self__.camera,G__7961,self__.render_options_ready,self__.render_options,self__.__meta,self__.__extmap,null));
+if(cljs.core.truth_(pred__7985.call(null,new cljs.core.Keyword(null,"init-scene","init-scene",-1015924774),expr__7986))){
+return (new glsl_graph.core.get_graph_Record(self__.renderer,self__.scene,self__.camera,G__7981,self__.render_options_ready,self__.render_options,self__.__meta,self__.__extmap,null));
 } else {
-if(cljs.core.truth_(pred__7965.call(null,new cljs.core.Keyword(null,"render-options-ready","render-options-ready",-765593401),expr__7966))){
-return (new glsl_graph.core.get_graph_Record(self__.renderer,self__.scene,self__.camera,self__.init_scene,G__7961,self__.render_options,self__.__meta,self__.__extmap,null));
+if(cljs.core.truth_(pred__7985.call(null,new cljs.core.Keyword(null,"render-options-ready","render-options-ready",-765593401),expr__7986))){
+return (new glsl_graph.core.get_graph_Record(self__.renderer,self__.scene,self__.camera,self__.init_scene,G__7981,self__.render_options,self__.__meta,self__.__extmap,null));
 } else {
-if(cljs.core.truth_(pred__7965.call(null,new cljs.core.Keyword(null,"render-options","render-options",686799147),expr__7966))){
-return (new glsl_graph.core.get_graph_Record(self__.renderer,self__.scene,self__.camera,self__.init_scene,self__.render_options_ready,G__7961,self__.__meta,self__.__extmap,null));
+if(cljs.core.truth_(pred__7985.call(null,new cljs.core.Keyword(null,"render-options","render-options",686799147),expr__7986))){
+return (new glsl_graph.core.get_graph_Record(self__.renderer,self__.scene,self__.camera,self__.init_scene,self__.render_options_ready,G__7981,self__.__meta,self__.__extmap,null));
 } else {
-return (new glsl_graph.core.get_graph_Record(self__.renderer,self__.scene,self__.camera,self__.init_scene,self__.render_options_ready,self__.render_options,self__.__meta,cljs.core.assoc.call(null,self__.__extmap,k__5581__auto__,G__7961),null));
+return (new glsl_graph.core.get_graph_Record(self__.renderer,self__.scene,self__.camera,self__.init_scene,self__.render_options_ready,self__.render_options,self__.__meta,cljs.core.assoc.call(null,self__.__extmap,k__5581__auto__,G__7981),null));
 }
 }
 }
@@ -3033,10 +3087,10 @@ var this__5585__auto____$1 = this;
 return cljs.core.seq.call(null,cljs.core.concat.call(null,new cljs.core.PersistentVector(null, 6, 5, cljs.core.PersistentVector.EMPTY_NODE, [(new cljs.core.PersistentVector(null,2,(5),cljs.core.PersistentVector.EMPTY_NODE,[new cljs.core.Keyword(null,"renderer","renderer",336841071),self__.renderer],null)),(new cljs.core.PersistentVector(null,2,(5),cljs.core.PersistentVector.EMPTY_NODE,[new cljs.core.Keyword(null,"scene","scene",1523800415),self__.scene],null)),(new cljs.core.PersistentVector(null,2,(5),cljs.core.PersistentVector.EMPTY_NODE,[new cljs.core.Keyword(null,"camera","camera",-1190348585),self__.camera],null)),(new cljs.core.PersistentVector(null,2,(5),cljs.core.PersistentVector.EMPTY_NODE,[new cljs.core.Keyword(null,"init-scene","init-scene",-1015924774),self__.init_scene],null)),(new cljs.core.PersistentVector(null,2,(5),cljs.core.PersistentVector.EMPTY_NODE,[new cljs.core.Keyword(null,"render-options-ready","render-options-ready",-765593401),self__.render_options_ready],null)),(new cljs.core.PersistentVector(null,2,(5),cljs.core.PersistentVector.EMPTY_NODE,[new cljs.core.Keyword(null,"render-options","render-options",686799147),self__.render_options],null))], null),self__.__extmap));
 });
 
-glsl_graph.core.get_graph_Record.prototype.cljs$core$IWithMeta$_with_meta$arity$2 = (function (this__5572__auto__,G__7961){
+glsl_graph.core.get_graph_Record.prototype.cljs$core$IWithMeta$_with_meta$arity$2 = (function (this__5572__auto__,G__7981){
 var self__ = this;
 var this__5572__auto____$1 = this;
-return (new glsl_graph.core.get_graph_Record(self__.renderer,self__.scene,self__.camera,self__.init_scene,self__.render_options_ready,self__.render_options,G__7961,self__.__extmap,self__.__hash));
+return (new glsl_graph.core.get_graph_Record(self__.renderer,self__.scene,self__.camera,self__.init_scene,self__.render_options_ready,self__.render_options,G__7981,self__.__extmap,self__.__hash));
 });
 
 glsl_graph.core.get_graph_Record.prototype.cljs$core$ICollection$_conj$arity$2 = (function (this__5578__auto__,entry__5579__auto__){
@@ -3051,23 +3105,23 @@ return cljs.core.reduce.call(null,cljs.core._conj,this__5578__auto____$1,entry__
 
 glsl_graph.core.get_graph_Record.prototype.com$stuartsierra$component$Lifecycle$ = true;
 
-glsl_graph.core.get_graph_Record.prototype.com$stuartsierra$component$Lifecycle$start$arity$1 = (function (G__7960){
+glsl_graph.core.get_graph_Record.prototype.com$stuartsierra$component$Lifecycle$start$arity$1 = (function (G__7980){
 var self__ = this;
-var G__7960__$1 = this;
-return ((function (G__7960__$1){
+var G__7980__$1 = this;
+return ((function (G__7980__$1){
 return (function (c){
 var c__$1 = cljs.core.assoc.call(null,c,new cljs.core.Keyword(null,"render-options","render-options",686799147),cljs.core.atom.call(null,null));
 var ready = promesa.core.then.call(null,glsl_graph.core.ajax.call(null,glsl_graph.core.graph_url,"json"),cljs.core.partial.call(null,glsl_graph.core.handle_graph,c__$1));
 var c__$2 = cljs.core.assoc.call(null,c__$1,new cljs.core.Keyword(null,"render-options-ready","render-options-ready",-765593401),ready);
 return c__$2;
-});})(G__7960__$1))
-.call(null,G__7960__$1);
+});})(G__7980__$1))
+.call(null,G__7980__$1);
 });
 
-glsl_graph.core.get_graph_Record.prototype.com$stuartsierra$component$Lifecycle$stop$arity$1 = (function (G__7960){
+glsl_graph.core.get_graph_Record.prototype.com$stuartsierra$component$Lifecycle$stop$arity$1 = (function (G__7980){
 var self__ = this;
-var G__7960__$1 = this;
-return cljs.core.identity.call(null,G__7960__$1);
+var G__7980__$1 = this;
+return cljs.core.identity.call(null,G__7980__$1);
 });
 
 glsl_graph.core.get_graph_Record.getBasis = (function (){
@@ -3088,8 +3142,8 @@ glsl_graph.core.__GT_get_graph_Record = (function glsl_graph$core$__GT_get_graph
 return (new glsl_graph.core.get_graph_Record(renderer,scene,camera,init_scene,render_options_ready,render_options,null,null,null));
 });
 
-glsl_graph.core.map__GT_get_graph_Record = (function glsl_graph$core$map__GT_get_graph_Record(G__7963){
-return (new glsl_graph.core.get_graph_Record(new cljs.core.Keyword(null,"renderer","renderer",336841071).cljs$core$IFn$_invoke$arity$1(G__7963),new cljs.core.Keyword(null,"scene","scene",1523800415).cljs$core$IFn$_invoke$arity$1(G__7963),new cljs.core.Keyword(null,"camera","camera",-1190348585).cljs$core$IFn$_invoke$arity$1(G__7963),new cljs.core.Keyword(null,"init-scene","init-scene",-1015924774).cljs$core$IFn$_invoke$arity$1(G__7963),new cljs.core.Keyword(null,"render-options-ready","render-options-ready",-765593401).cljs$core$IFn$_invoke$arity$1(G__7963),new cljs.core.Keyword(null,"render-options","render-options",686799147).cljs$core$IFn$_invoke$arity$1(G__7963),null,cljs.core.dissoc.call(null,G__7963,new cljs.core.Keyword(null,"renderer","renderer",336841071),new cljs.core.Keyword(null,"scene","scene",1523800415),new cljs.core.Keyword(null,"camera","camera",-1190348585),new cljs.core.Keyword(null,"init-scene","init-scene",-1015924774),new cljs.core.Keyword(null,"render-options-ready","render-options-ready",-765593401),new cljs.core.Keyword(null,"render-options","render-options",686799147)),null));
+glsl_graph.core.map__GT_get_graph_Record = (function glsl_graph$core$map__GT_get_graph_Record(G__7983){
+return (new glsl_graph.core.get_graph_Record(new cljs.core.Keyword(null,"renderer","renderer",336841071).cljs$core$IFn$_invoke$arity$1(G__7983),new cljs.core.Keyword(null,"scene","scene",1523800415).cljs$core$IFn$_invoke$arity$1(G__7983),new cljs.core.Keyword(null,"camera","camera",-1190348585).cljs$core$IFn$_invoke$arity$1(G__7983),new cljs.core.Keyword(null,"init-scene","init-scene",-1015924774).cljs$core$IFn$_invoke$arity$1(G__7983),new cljs.core.Keyword(null,"render-options-ready","render-options-ready",-765593401).cljs$core$IFn$_invoke$arity$1(G__7983),new cljs.core.Keyword(null,"render-options","render-options",686799147).cljs$core$IFn$_invoke$arity$1(G__7983),null,cljs.core.dissoc.call(null,G__7983,new cljs.core.Keyword(null,"renderer","renderer",336841071),new cljs.core.Keyword(null,"scene","scene",1523800415),new cljs.core.Keyword(null,"camera","camera",-1190348585),new cljs.core.Keyword(null,"init-scene","init-scene",-1015924774),new cljs.core.Keyword(null,"render-options-ready","render-options-ready",-765593401),new cljs.core.Keyword(null,"render-options","render-options",686799147)),null));
 });
 
 
@@ -3104,22 +3158,22 @@ cljs.core.reset_BANG_.call(null,glsl_graph.core.ran,true);
 cljs.core.println.call(null,"main");
 
 try{cljs.core.swap_BANG_.call(null,glsl_graph.core.system,com.stuartsierra.component.stop_system);
-}catch (e7971){if((e7971 instanceof Object)){
-var e_7973 = e7971;
-var simple_e_7974 = com.stuartsierra.component.ex_without_components.call(null,e_7973);
-console.log(simple_e_7974);
+}catch (e7991){if((e7991 instanceof Object)){
+var e_7993 = e7991;
+var simple_e_7994 = com.stuartsierra.component.ex_without_components.call(null,e_7993);
+console.log(simple_e_7994);
 
-console.log((simple_e_7974["cause"]));
+console.log((simple_e_7994["cause"]));
 
-throw (simple_e_7974["cause"]);
+throw (simple_e_7994["cause"]);
 } else {
-throw e7971;
+throw e7991;
 
 }
 }
 try{return cljs.core.swap_BANG_.call(null,glsl_graph.core.system,com.stuartsierra.component.start_system);
-}catch (e7972){if((e7972 instanceof Object)){
-var e = e7972;
+}catch (e7992){if((e7992 instanceof Object)){
+var e = e7992;
 var simple_e = com.stuartsierra.component.ex_without_components.call(null,e);
 console.log(simple_e);
 
@@ -3127,7 +3181,7 @@ console.log((simple_e["cause"]));
 
 throw (simple_e["cause"]);
 } else {
-throw e7972;
+throw e7992;
 
 }
 }});
@@ -3140,4 +3194,4 @@ glsl_graph.core.on_js_reload = (function glsl_graph$core$on_js_reload(){
 return null;
 });
 
-//# sourceMappingURL=core.js.map?rel=1445449313589
+//# sourceMappingURL=core.js.map?rel=1446114638349

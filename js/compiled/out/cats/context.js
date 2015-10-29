@@ -14,23 +14,23 @@ cats.context.not_nil_QMARK_ = cljs.core.comp.call(null,cljs.core.not,cljs.core.n
  *   the provided instance.
  */
 cats.context.get_current = (function cats$context$get_current(var_args){
-var args8087 = [];
-var len__6017__auto___8092 = arguments.length;
-var i__6018__auto___8093 = (0);
+var args8107 = [];
+var len__6017__auto___8112 = arguments.length;
+var i__6018__auto___8113 = (0);
 while(true){
-if((i__6018__auto___8093 < len__6017__auto___8092)){
-args8087.push((arguments[i__6018__auto___8093]));
+if((i__6018__auto___8113 < len__6017__auto___8112)){
+args8107.push((arguments[i__6018__auto___8113]));
 
-var G__8094 = (i__6018__auto___8093 + (1));
-i__6018__auto___8093 = G__8094;
+var G__8114 = (i__6018__auto___8113 + (1));
+i__6018__auto___8113 = G__8114;
 continue;
 } else {
 }
 break;
 }
 
-var G__8089 = args8087.length;
-switch (G__8089) {
+var G__8109 = args8107.length;
+switch (G__8109) {
 case 0:
 return cats.context.get_current.cljs$core$IFn$_invoke$arity$0();
 
@@ -40,7 +40,7 @@ return cats.context.get_current.cljs$core$IFn$_invoke$arity$1((arguments[(0)]));
 
 break;
 default:
-throw (new Error([cljs.core.str("Invalid arity: "),cljs.core.str(args8087.length)].join('')));
+throw (new Error([cljs.core.str("Invalid arity: "),cljs.core.str(args8107.length)].join('')));
 
 }
 });
@@ -72,4 +72,4 @@ return cats.context.throw_ilegal_argument.call(null,"No context is set and it ca
 
 cats.context.get_current.cljs$lang$maxFixedArity = 1;
 
-//# sourceMappingURL=context.js.map?rel=1445449314673
+//# sourceMappingURL=context.js.map?rel=1446114639468

@@ -34,23 +34,23 @@ throw cljs.core.missing_protocol.call(null,"IPromise.-then",_);
  * Catch chain operation over promise.
  */
 promesa.protocols._catch = (function promesa$protocols$_catch(var_args){
-var args8098 = [];
-var len__6017__auto___8101 = arguments.length;
-var i__6018__auto___8102 = (0);
+var args8118 = [];
+var len__6017__auto___8121 = arguments.length;
+var i__6018__auto___8122 = (0);
 while(true){
-if((i__6018__auto___8102 < len__6017__auto___8101)){
-args8098.push((arguments[i__6018__auto___8102]));
+if((i__6018__auto___8122 < len__6017__auto___8121)){
+args8118.push((arguments[i__6018__auto___8122]));
 
-var G__8103 = (i__6018__auto___8102 + (1));
-i__6018__auto___8102 = G__8103;
+var G__8123 = (i__6018__auto___8122 + (1));
+i__6018__auto___8122 = G__8123;
 continue;
 } else {
 }
 break;
 }
 
-var G__8100 = args8098.length;
-switch (G__8100) {
+var G__8120 = args8118.length;
+switch (G__8120) {
 case 2:
 return promesa.protocols._catch.cljs$core$IFn$_invoke$arity$2((arguments[(0)]),(arguments[(1)]));
 
@@ -60,7 +60,7 @@ return promesa.protocols._catch.cljs$core$IFn$_invoke$arity$3((arguments[(0)]),(
 
 break;
 default:
-throw (new Error([cljs.core.str("Invalid arity: "),cljs.core.str(args8098.length)].join('')));
+throw (new Error([cljs.core.str("Invalid arity: "),cljs.core.str(args8118.length)].join('')));
 
 }
 });
@@ -179,4 +179,4 @@ throw cljs.core.missing_protocol.call(null,"IState.-done?",_);
 });
 
 
-//# sourceMappingURL=protocols.js.map?rel=1445449314762
+//# sourceMappingURL=protocols.js.map?rel=1446114639555
