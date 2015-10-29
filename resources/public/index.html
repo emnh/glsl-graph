@@ -245,16 +245,22 @@ void main( void ) {
   //delta = clamp(delta, vec3(-maxSpeed), vec3(maxSpeed));
 
   // center positions
-  vec3 minimum = planetPos;
-  vec3 maximum = planetPos;
-  for (float i = 0.0; i < NODECOUNTF; i += 1.0) {
-    vec4 tpos = texture2D(u_texture_positions, nodeIndexToPos(i));
-    vec3 planet2Pos = scalePos(tpos.xyz);
-    minimum = min(minimum, planet2Pos);
-    maximum = max(maximum, planet2Pos);
+  vec3 center = vec3(0.0);
+  vec3 scale = vec3(1.0);
+ 
+  // TODO: optimize it, or adjust parameter to every X frame
+  if (mod(u_iteration, 1.0) == 0.0) {
+    vec3 minimum = planetPos;
+    vec3 maximum = planetPos;
+    for (float i = 0.0; i < NODECOUNTF; i += 1.0) {
+      vec4 tpos = texture2D(u_texture_positions, nodeIndexToPos(i));
+      vec3 planet2Pos = scalePos(tpos.xyz);
+      minimum = min(minimum, planet2Pos);
+      maximum = max(maximum, planet2Pos);
+    }
+    center = minimum + (maximum - minimum) / 2.0;
+    scale = (maximum - minimum) / SCALE;
   }
-  vec3 center = minimum + (maximum - minimum) / 2.0;
-  vec3 scale = (maximum - minimum) / SCALE;
 
   vec3 newPosition = (planetPos - center) / scale;
   newPosition += TIMEDELTA * delta * alpha / pow(abs(u_speed_reduction), 1.5);
@@ -328,7 +334,7 @@ vec3 project(vec3 diff) {
 float attract(float d) {
   return d;
   // return log(d);
-  // return d * d;
+  // return d * d / 100.0;
 }
 
 float rand(vec2 co){
@@ -372,10 +378,13 @@ vec3 calcSpring(float degree, vec3 planetPos, float planetIndex) {
   // spring force
   //diff = normalize(diff);
   float SPRING_LENGTH = u_spring_length;
-  float SPRING_COEFF = u_spring_coefficient * 100.0;
+  float SPRING_COEFF = u_spring_coefficient;
   float k1 = 1.0;
   float X = attract(k1 * abs(SPRING_LENGTH - dist));
   float F_spring = SPRING_COEFF * X;
+  if (dist > SPRING_LENGTH) {
+    diff = normalize(diff);
+  }
   delta += diff * F_spring * k;
   //delta = clamp(delta, -1.0, 1.0);
 
@@ -397,7 +406,7 @@ vec3 calcSpring(float degree, vec3 planetPos, float planetIndex) {
   // Coloumb force
   float ke = 0.1;
   vec3 F_C = -ke * diff;
-  delta += F_C;
+  // delta += F_C;
 
   // gravity
   // float F_gravity = -1.2 / (u_min_dist + distSquare) / u_dist_reduction / 10000.0;
@@ -421,26 +430,16 @@ vec3 calcGravity(float degree, vec3 planetPos, vec4 tpos, vec3 planet2Pos) {
   //float k = other_degree / (other_degree + degree);
   float k = 1.0 - other_degree / (other_degree + degree);
 
-  /*if (dist < 0.1) {
-    // TODO: not working
-    vec2 co = vec2(u_time/5.0, u_time/3.0) + planetIndex;
-    vec2 co2 = vec2(u_time/13.0, u_time/17.0) + planetIndex;
-    vec2 co3 = vec2(u_time/29.0, u_time/53.0) + planetIndex;
-    diff = vec3(rand(co), rand(co2), rand(co3));
-    diff = project(diff);
-    dist = length(diff);
-    distSquare = dist * dist;
-  }*/
-
   // gravity
-  const float G = -1.2 * 10.0 * 0.001;
+  const float min_dist = 0.1;
+  const float G = -1.2;
   //float F_gravity = G / (u_min_dist + distSquare) / u_dist_reduction;
-  float F_gravity = G / (1.0 + abs(dist)) / u_dist_reduction;
+  float F_gravity = G / (min_dist + abs(distSquare)) / u_dist_reduction;
   //delta += normalize(diff) * F_gravity;
+  if (dist >= 1.0) {
+    diff = normalize(diff);
+  }
   delta += diff * F_gravity * k;
-
-  // Coloumb force
-  // delta -= 0.001 * diff;
 
   // center
   if (
@@ -514,13 +513,13 @@ void main( void ) {
     vec3 planet2Pos = scalePos(tpos.xyz);
     gravity += calcGravity(degree, planetPos, tpos, planet2Pos);
   }
-  float clampSize = 1.0;
+  float clampSize = 1000.0;
   //spring = clamp(spring, vec3(-clampSize), vec3(clampSize));
   //gravity = clamp(gravity, vec3(-clampSize), vec3(clampSize));
   delta = spring + gravity;
-  delta /= pow(SCALE, 1.5);
-  delta = clamp(delta, vec3(-clampSize), vec3(clampSize));
-  planetVelocity = clamp(planetVelocity, vec3(-clampSize), vec3(clampSize));
+  delta /= pow(SCALE, 1.35);
+  //delta = clamp(delta, vec3(-clampSize), vec3(clampSize));
+  //planetVelocity = clamp(planetVelocity, vec3(-clampSize), vec3(clampSize));
   
   planetVelocity = (planetVelocity * 0.9 + delta * alpha);
   planetVelocity = (planetVelocity + 1.0) / 2.0;
