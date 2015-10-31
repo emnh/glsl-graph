@@ -456,7 +456,7 @@
                         (get nodes-reverse (get edge 1))])
                      edges)
      node-count (count nodes)
-     node-neighbours (vec (map #(vector) (range node-count)))
+     node-neighbours (vec (map #(set []) (range node-count)))
      node-neighbours (reduce
                        (fn [m edge]
                          (-> m
@@ -464,6 +464,7 @@
                            (update-in [(get edge 1)] #(conj % (get edge 0)))))
                        node-neighbours
                        edges-indexed)
+     node-neighbours (vec (map #(vec %) node-neighbours))
      degrees (map #(count %) node-neighbours)
      max-degree (apply max degrees)
      [node-neighbours-startpos total] 
