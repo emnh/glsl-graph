@@ -235,6 +235,7 @@
        set-size (or set-size (cell= (-> renderer (.setSize width height))))
        ]
       (-> $body (.append (-> renderer .-domElement)))
+      (-> renderer (.setClearColor 0xFFFFFF))
       (->
         c
         (assoc :set-size set-size)))
@@ -677,6 +678,8 @@
      _ (set! screen-camera.position.z 1.2)
      ;controls (new js/OrbitControls screen-camera (-> renderer .-domElement))
      controls (new js/OrbitControls screen-camera)
+
+     ; POINTS
      screen-geometry (new THREE.Geometry)
      screen-uniforms (clj->js
                        {
@@ -711,11 +714,10 @@
                        (clj->js
                          {
                           :uniforms screen-uniforms
-                          ;:attributes screen-attributes
                           :vertexShader screen-vs
                           :fragmentShader screen-fs
-                          :transparent true
-                          :blending THREE.AdditiveBlending
+                          ;:transparent true
+                          ;:blending THREE.AdditiveBlending
                           :depthWrite false
                           }))
      screen-geometry (new THREE.BufferGeometry)
@@ -785,8 +787,8 @@
                             :uniforms screen-uniforms
                             :vertexShader lines-vs
                             :fragmentShader lines-fs
-                            :transparent true
-                            :blending THREE.AdditiveBlending
+                            ;:transparent true
+                            ;:blending THREE.SubtractiveBlending
                             :depthWrite false
                             }))
      position (-> lines-geometry (.getAttribute "position"))
