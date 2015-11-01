@@ -80,7 +80,7 @@
            dat-gui (data dat-gui)
            ; Make easier range. Had problems with float values in dat.gui.
            spin_factor 1.0
-           u_gravity_factor 1000.0
+           u_gravity_factor 1.0
            u_spring_length_factor 1.0
            u_spring_coefficient_factor 1.0
            u_min_dist_factor 1000.0
