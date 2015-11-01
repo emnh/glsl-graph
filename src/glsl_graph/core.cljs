@@ -66,37 +66,74 @@
   system
   init-dat
   [dat-gui get-graph]
-  []
+  [dat-gui-items]
   (fn [c]
-    (m/mlet
-      [a (:render-options-ready get-graph)]
-      (let
-        [render-options @(:render-options get-graph)
-         uniforms (:uniforms render-options)
-         dat-gui (data dat-gui)
-         config #js 
-         {
-          :u_dist_reduction (* (aget uniforms "u_dist_reduction" "value") 1000)
-          :u_spring_coefficient (* (aget uniforms "u_spring_coefficient" "value") 1000)
-          :u_spring_length (* (aget uniforms "u_spring_length" "value") 1000)
-          }]
-        (-> dat-gui 
-          (.add config "u_dist_reduction")
-          (.min 0.001)
-          (.step 0.001)
-          (.onChange (fn [value]
-                       (println "set value" value)
-                       (aset uniforms "u_dist_reduction" "value" (/ value 1000)))))
-        (-> dat-gui
-          (.add config "u_spring_coefficient")
-          (.onChange (fn [value]
-                       (aset uniforms "u_spring_coefficient" "value" (/ value 1000)))))
-        (-> dat-gui
-          (.add config "u_spring_length")
-          (.onChange (fn [value]
-                       (aset uniforms "u_spring_length" "value" (/ value 1000)))))
-        ))
-    c)
+    (let
+      [dat-gui-items (or dat-gui-items (atom []))]
+      (m/mlet
+        [a (:render-options-ready get-graph)]
+        (let
+          [
+           render-options-atom (:render-options get-graph)
+           render-options @render-options-atom
+           uniforms (:uniforms render-options)
+           dat-gui (data dat-gui)
+           ; Make easier range. Had problems with float values in dat.gui.
+           spin_factor 1.0
+           u_gravity_factor 1000.0
+           u_spring_length_factor 1.0
+           u_spring_coefficient_factor 1.0
+           u_min_dist_factor 1000.0
+           u_decay_factor 10000.0
+           config #js 
+           {
+            :spin (* (:spin render-options) spin_factor)
+            :u_gravity (* (aget uniforms "u_gravity" "value") u_gravity_factor)
+            :u_spring_coefficient (* (aget uniforms "u_spring_coefficient" "value") u_spring_coefficient_factor)
+            :u_spring_length (* (aget uniforms "u_spring_length" "value") u_spring_length_factor)
+            :u_speed_reduction (* (aget uniforms "u_speed_reduction" "value") 1.0)
+            :u_min_dist (* (aget uniforms "u_min_dist" "value") u_min_dist_factor)
+            :u_decay (* (aget uniforms "u_decay" "value") u_decay_factor)
+            }
+           _ (doseq [item @dat-gui-items]
+               (-> dat-gui (.remove item)))
+           ]
+           (reset!
+             dat-gui-items
+             [
+              (-> dat-gui 
+                (.add config "spin" 0.0 spin_factor)
+                (.onChange (fn [value]
+                             (swap! render-options-atom #(assoc % :spin (/ value spin_factor))))))
+              (-> dat-gui 
+                (.add config "u_gravity" -1000000.0 0.0)
+                (.onChange (fn [value]
+                             (aset uniforms "u_gravity" "value" (/ value u_gravity_factor)))))
+              (-> dat-gui
+                (.add config "u_spring_coefficient" 0.0 10.0)
+                (.onChange (fn [value]
+                             (aset uniforms "u_spring_coefficient" "value" (/ value 1.0)))))
+              (-> dat-gui
+                (.add config "u_spring_length" 1.0 100.0)
+                (.onChange (fn [value]
+                             (aset uniforms "u_spring_length" "value" (/ value u_spring_length_factor)))))
+              (-> dat-gui
+                (.add config "u_speed_reduction" 1000.0 100000.0)
+                (.onChange (fn [value]
+                             (aset uniforms "u_speed_reduction" "value" (/ value 1.0)))))
+              (-> dat-gui
+                (.add config "u_min_dist" 1.0 10000.0)
+                (.onChange (fn [value]
+                             (aset uniforms "u_min_dist" "value" (/ value u_min_dist_factor)))))
+              (-> dat-gui
+                (.add config "u_decay" 0.0 10000.0)
+                (.onChange (fn [value]
+                             (aset uniforms "u_decay" "value" (/ value u_decay_factor)))))
+              ]
+             )))
+      (-> c
+        (assoc :dat-gui-items dat-gui-items))
+      ))
   identity
   )
 
@@ -282,19 +319,23 @@
   )
 
 (defn render-loop-screen
-  [c o]
+  [c o-atom]
   (let
     [camera (:camera (:camera c))
      scene (data (:scene c))
      renderer (data (:renderer c))
      running @(:running c)
-     o (if (= o nil) 
-         @(get-in c [:get-graph :render-options])
-         o)
+     o-atom (or o-atom (get-in c [:get-graph :render-options]))
+     o @o-atom
      ]
     (if 
       (not= o nil)
       (do
+        ; rotate scene
+        (let
+          [screen-scene (:screen-scene o)]
+          (-> screen-scene .-rotation .-y (set! (+ (-> screen-scene .-rotation .-y) (:spin o)))))
+
         ; render to screen
         (aset (:screen-uniforms o) "u_texture_positions" "value" (:rt-positions1 o))
         (-> (:renderer o) (.setSize window.innerWidth window.innerHeight))
@@ -312,7 +353,7 @@
                (assoc :rt-positions1 (:rt-positions2 o))
                (assoc :rt-positions2 (:rt-positions1 o))
                )]
-          (if running (js/requestAnimationFrame (partial render-loop-screen c o)))
+          (if running (js/requestAnimationFrame (partial render-loop-screen c o-atom)))
           ))
       (if running (js/requestAnimationFrame (partial render-loop-screen c nil)))
       )
@@ -486,7 +527,6 @@
      th node-sq
      ew edge-sq
      eh edge-sq
-     floats-per-planet 4.0
      out-width node-sq
      out-height node-sq
      renderer (data (:renderer c))
@@ -505,7 +545,7 @@
               :EDGECOUNT edge-count
               :SQNODE node-sq
               :SQEDGE edge-sq
-              :USE3D "false"
+              :USE3D "true"
               })
      uniforms (clj->js {
                         :u_time
@@ -526,27 +566,32 @@
                         :u_speed_reduction
                         {
                          :type "f"
-                         :value 1000.0
+                         :value 12000.0
                          }
                         :u_min_dist
                         {
                          :type "f"
-                         :value 1.0
+                         :value 0.1
                          }
                         :u_spring_coefficient
                         {
                          :type "f"
-                         :value 100.0
+                         :value 0.100
                          }
                         :u_spring_length
                         {
                          :type "f"
                          :value 3.0
                          }
-                        :u_dist_reduction
+                        :u_gravity
                         {
                          :type "f"
-                         :value (/ 30.0 1000000.0)
+                         :value -1.0
+                         }
+                        :u_decay
+                        {
+                         :type "f"
+                         :value 0.9999
                          }
                         :u_node_count 
                         {
@@ -629,7 +674,7 @@
      screen-scene (new THREE.Scene)
      screen-camera (new THREE.PerspectiveCamera 
                         75 (/ window.innerWidth window.innerHeight) 0.1 1000)
-     _ (set! screen-camera.position.z 0.2)
+     _ (set! screen-camera.position.z 1.2)
      ;controls (new js/OrbitControls screen-camera (-> renderer .-domElement))
      controls (new js/OrbitControls screen-camera)
      screen-geometry (new THREE.Geometry)
@@ -813,6 +858,7 @@
        :screen-scene screen-scene
        :screen-camera screen-camera
        :screen-uniforms screen-uniforms
+       :spin 0.01
        :c c
        }
      ]
