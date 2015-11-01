@@ -268,22 +268,23 @@
   )
 
 (defn render-loop-compute
-  [c o]
+  [c o-atom]
   (let
     [camera (:camera (:camera c))
      scene (data (:scene c))
      renderer (data (:renderer c))
      running @(:running c)
-     o (if (= o nil) 
-         @(get-in c [:get-graph :render-options])
-         o)
+     o-atom (or o-atom (get-in c [:get-graph :render-options]))
+     o @o-atom
+     current-time (-> (new js/Date) .getTime)
+     render-time (- current-time (:last-render o))
      ]
     (if 
-      (not= o nil)
+      (and (not= o nil) (<= render-time (/ 1000.0 120.0)))
       (do
         (doseq [i (range 1)]
           (aset (:uniforms o) "u_time_old" "value" (aget (:uniforms o) "u_time" "value"))
-          (aset (:uniforms o) "u_time" "value" (/ (-> (new js/Date) .getTime) 1000.0))
+          (aset (:uniforms o) "u_time" "value" (/ current-time 1000.0))
           (aset (:uniforms o) "u_time_delta" "value" (- (aget (:uniforms o) "u_time" "value") (aget (:uniforms o) "u_time_old" "value")))
           (aset (:uniforms o) "u_texture_positions" "value" (:rt-positions2 o))
           (aset (:uniforms o) "u_texture_velocities" "value" (:rt-velocities2 o))
@@ -305,16 +306,14 @@
             ))
 
         ; swap buffers and iterate
-        (let
-          [o (-> o
-               (assoc :rt-positions1 (:rt-positions2 o))
-               (assoc :rt-positions2 (:rt-positions1 o))
-               (assoc :rt-velocities1 (:rt-velocities2 o))
-               (assoc :rt-velocities2 (:rt-velocities1 o))
-               )]
-          (if running (js/setTimeout (partial render-loop-compute c o) 0))
-          ))
-      (if running (js/setTimeout (partial render-loop-compute c nil) 0))
+        (swap! o-atom 
+               #(-> %
+                 (assoc :rt-positions1 (:rt-positions2 o))
+                 (assoc :rt-positions2 (:rt-positions1 o))
+                 (assoc :rt-velocities1 (:rt-velocities2 o))
+                 (assoc :rt-velocities2 (:rt-velocities1 o))))
+        (if running (js/setTimeout (partial render-loop-compute c o-atom) 0)))
+      (if running (js/setTimeout (partial render-loop-compute c o-atom) 0))
       )
     )
   )
@@ -355,7 +354,9 @@
                (assoc :rt-positions2 (:rt-positions1 o))
                )]
           (if running (js/requestAnimationFrame (partial render-loop-screen c o-atom)))
-          ))
+          )
+        (swap! o-atom #(assoc % :last-render (-> (new js/Date) .getTime)))
+        )
       (if running (js/requestAnimationFrame (partial render-loop-screen c nil)))
       )
     )
