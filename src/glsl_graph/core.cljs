@@ -717,7 +717,7 @@
                           :uniforms screen-uniforms
                           :vertexShader screen-vs
                           :fragmentShader screen-fs
-                          ;:transparent true
+                          :transparent true
                           ;:blending THREE.AdditiveBlending
                           :depthWrite false
                           }))
@@ -788,7 +788,7 @@
                             :uniforms screen-uniforms
                             :vertexShader lines-vs
                             :fragmentShader lines-fs
-                            ;:transparent true
+                            :transparent true
                             ;:blending THREE.SubtractiveBlending
                             :depthWrite false
                             }))
