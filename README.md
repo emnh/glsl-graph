@@ -18,6 +18,8 @@ to work fine up to at least ~2000 nodes and ~6000 edges.
 
 To get an interactive development environment run:
 
+    npm install
+    ./compile-deps.sh
     lein figwheel
 
 and open your browser at [localhost:3449](http://localhost:3449/).
